@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LexIA: Asistente Jurídico Inteligente</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #1a2a44;
+            /* Azul oscuro corporativo */
+            --secondary-color: #2c3e50;
+            /* Gris azulado */
+            --accent-color: #3498db;
+            /* Azul brillante */
+            --bg-color: #f4f6f9;
+            /* Gris claro fondo */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .main-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+            margin-bottom: 1.5rem;
+            background: white;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header i {
+            color: var(--accent-color);
+        }
+
+        .btn-custom-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-custom-primary:hover {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        /* Chat Styles */
+        #chat-container {
+            height: 350px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #fafbfc;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message-user {
+            background-color: var(--accent-color);
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message-ia {
+            background-color: #e9ecef;
+            color: #333;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+
+        .loading-spinner {
+            display: none;
+            margin-left: 10px;
+        }
+
+        .result-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="main-header text-center">
+        <div class="container">
+            <h1><i class="fas fa-scale-balanced me-2"></i>LexIA</h1>
+            <p class="mb-0 text-white-50">Asistente Jurídico Inteligente</p>
+        </div>
+    </header>
+
+    <div class="container pb-5">
+        <div class="row g-4">
+
+            <!-- TARJETA 1: GLOSARIO INTELIGENTE -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between">
+                        <span><i class="fas fa-book"></i> Glosario Inteligente</span>
+                        <button onclick="borrarHistorial()" class="btn btn-sm btn-outline-danger"
+                            title="Borrar historial">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <form id="glosarioForm">
+                            <div class="mb-3">
+                                <label class="form-label text-secondary">Palabra / Término</label>
+                                <input type="text" class="form-control" id="terminoPalabra"
+                                    placeholder="Ej: Hábeas Corpus">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-secondary">Materia</label>
+                                <input type="text" class="form-control" id="terminoMateria"
+                                    placeholder="Ej: Penal, Civil...">
+                            </div>
+                            <button type="button" onclick="generarFicha()" class="btn btn-primary w-100">
+                                <span id="spinnerGlosario" class="spinner-border spinner-border-sm loading-spinner"
+                                    role="status"></span>
+                                Generar Ficha
+                            </button>
+                        </form>
+                        <div id="resultadoGlosario" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARJETA 2: FUENTE DE CONOCIMIENTO -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <i class="fas fa-file-pdf"></i> Fuente de Conocimiento
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="pdfFile" class="form-label text-secondary">Cargar Documento PDF</label>
+                            <input class="form-control" type="file" id="pdfFile" accept="application/pdf">
+                            <div class="form-text">El archivo se usará para memorizar y buscar fragmentos.</div>
+                        </div>
+                        <button type="button" onclick="memorizarDocumento()" class="btn btn-success w-100">
+                            <span id="spinnerPdf" class="spinner-border spinner-border-sm loading-spinner"
+                                role="status"></span>
+                            Memorizar Documento
+                        </button>
+                        <div id="alertaPdf" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARJETA 3: LUPA LEGAL -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <i class="fas fa-search"></i> Lupa Legal
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label text-secondary">Frase exacta a buscar</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="keywordBusqueda"
+                                    placeholder="Ej: Artículo 16...">
+                                <button class="btn btn-info text-white" type="button" onclick="buscarFragmento()">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
+                        </div>
+                        <div id="resultadoBusqueda"></div>
+                        <div class="alert alert-light border mt-2 small text-muted">
+                            <i class="fas fa-info-circle"></i> Requiere que hayas seleccionado un PDF en el panel
+                            superior.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TARJETA 4: TUTOR VIRTUAL -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-lg"> <!-- Shadow gives it more depth -->
+                    <div class="card-header bg-primary text-white"> <!-- Distinct header for chat -->
+                        <i class="fas fa-robot text-white"></i> Tutor Virtual
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div id="chat-container">
+                            <div class="message message-ia">
+                                ¡Hola! Soy LexIA, tu asistente legal. ¿En qué puedo ayudarte hoy?
+                            </div>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="input-group">
+                                <input type="text" id="preguntaTutor" class="form-control"
+                                    placeholder="Escribe tu duda jurídica aquí...">
+                                <button class="btn btn-primary" type="button" onclick="preguntarTutor()">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- App Logic -->
+    <script>
+        const API_URL = ""; // Relative path
+
+        // --- TARJETA 1: GLOSARIO ---
+        async function generarFicha() {
+            const btn = document.querySelector('button[onclick="generarFicha()"]');
+            const spinner = document.getElementById('spinnerGlosario');
+            const resultadoDiv = document.getElementById('resultadoGlosario');
+            const palabra = document.getElementById('terminoPalabra').value;
+            const materia = document.getElementById('terminoMateria').value;
+
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            resultadoDiv.innerHTML = '';
+
+            try {
+                const response = await fetch('/agregar_termino/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        palabra: palabra,
+                        materia: materia,
+                        definicion_tecnica: "" // Empty to trigger auto-generation
+                    })
+                });
+
+                if (!response.ok) throw new Error('Error al generar ficha');
+
+                const data = await response.json();
+
+                resultadoDiv.innerHTML = `
+                    <div class="result-box">
+                        <h5 class="text-primary">${data.palabra}</h5>
+                        <p><strong>Definición:</strong> ${data.definicion_tecnica}</p>
+                        <p><strong>Explicación Sencilla:</strong> ${data.explicacion_sencilla}</p>
+                        <p class="mb-0"><strong>🧠 Mnemotecnia:</strong> ${data.mnemotecnia}</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultadoDiv.innerHTML = `<div class="alert alert-danger mt-2">Error: ${error.message}</div>`;
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        }
+
+        async function borrarHistorial() {
+            if (!confirm("¿Estás seguro de que quieres borrar todo el historial del glosario?")) return;
+
+            const resultadoDiv = document.getElementById('resultadoGlosario');
+            try {
+                const response = await fetch('/borrar_historial/', { method: 'DELETE' });
+                const data = await response.json();
+                resultadoDiv.innerHTML = `<div class="alert alert-success mt-2">${data.mensaje}</div>`;
+                // Limpiar inputs
+                document.getElementById('terminoPalabra').value = '';
+                document.getElementById('terminoMateria').value = '';
+            } catch (error) {
+                alert("Error al borrar historial");
+            }
+        }
+
+        // --- TARJETA 2: MEMORIZAR PDF ---
+        async function memorizarDocumento() {
+            const fileInput = document.getElementById('pdfFile');
+            const alertaDiv = document.getElementById('alertaPdf');
+            const spinner = document.getElementById('spinnerPdf');
+            const btn = document.querySelector('button[onclick="memorizarDocumento()"]');
+
+            if (!fileInput.files[0]) {
+                alertaDiv.innerHTML = '<div class="alert alert-warning">Por favor selecciona un archivo PDF.</div>';
+                return;
+            }
+
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            alertaDiv.innerHTML = '';
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            // No enviamos keyword para solo procesar
+
+            try {
+                const response = await fetch('/buscar_en_pdf/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) throw new Error(data.detail || 'Error al procesar');
+
+                alertaDiv.innerHTML = `<div class="alert alert-success">✅ ${data.mensaje || 'Documento memorizado correctamente.'}</div>`;
+            } catch (error) {
+                alertaDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        }
+
+        // --- TARJETA 3: LUPA LEGAL ---
+        async function buscarFragmento() {
+            const fileInput = document.getElementById('pdfFile');
+            const keyword = document.getElementById('keywordBusqueda').value;
+            const resultadoDiv = document.getElementById('resultadoBusqueda');
+
+            if (!fileInput.files[0]) {
+                alert("⚠️ Primero debes seleccionar un archivo PDF en el panel 'Fuente de Conocimiento'.");
+                return;
+            }
+            if (!keyword.trim()) {
+                alert("Ingresa una frase para buscar.");
+                return;
+            }
+
+            resultadoDiv.innerHTML = '<div class="text-center text-muted"><small>Buscando...</small></div>';
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('keyword', keyword);
+
+            try {
+                const response = await fetch('/buscar_en_pdf/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.encontrado) {
+                    resultadoDiv.innerHTML = `
+                        <div class="result-box border-start-info">
+                            <strong>Fragmento encontrado:</strong><br>
+                            <i class="text-muted">"${data.fragmento}"</i>
+                        </div>
+                    `;
+                } else {
+                    resultadoDiv.innerHTML = `<div class="alert alert-warning mt-2">No se encontró la frase exacta.</div>`;
+                }
+            } catch (error) {
+                resultadoDiv.innerHTML = `<div class="alert alert-danger mt-2">Error en búsqueda.</div>`;
+            }
+        }
+
+        // --- TARJETA 4: TUTOR VIRTUAL ---
+        async function preguntarTutor() {
+            const input = document.getElementById('preguntaTutor');
+            const chatContainer = document.getElementById('chat-container');
+            const pregunta = input.value;
+            const btn = document.querySelector('button[onclick="preguntarTutor()"]');
+
+            if (!pregunta.trim()) return;
+
+            // Agregar mensaje usuario
+            appendMessage(pregunta, 'user');
+            input.value = '';
+
+            // Loading state
+            const loadingId = 'loading-' + Date.now();
+            chatContainer.innerHTML += `<div id="${loadingId}" class="message message-ia"><i class="fas fa-circle-notch fa-spin"></i> Consultando leyes...</div>`;
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/preguntar_tutor/?pregunta=' + encodeURIComponent(pregunta), {
+                    method: 'POST'
+                });
+
+                const data = await response.json();
+
+                // Remover loading
+                document.getElementById(loadingId).remove();
+
+                if (!response.ok) {
+                    appendMessage(data.detail || "Error al consultar al tutor.", 'ia');
+                } else {
+                    appendMessage(data.respuesta, 'ia');
+                }
+
+            } catch (error) {
+                document.getElementById(loadingId).remove();
+                appendMessage("Error de conexión. Intenta de nuevo.", 'ia');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function appendMessage(text, sender) {
+            const chatContainer = document.getElementById('chat-container');
+            const div = document.createElement('div');
+            div.className = `message message-${sender}`;
+            // Convertir saltos de línea a <br> para mejor formato en IA
+            div.innerHTML = text.replace(/\n/g, '<br>');
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Permitir Enter para enviar en chat/busqueda/glosario
+        document.getElementById('preguntaTutor').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') preguntarTutor();
+        });
+        document.getElementById('keywordBusqueda').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') buscarFragmento();
+        });
+    </script>
+</body>
+
+</html>
