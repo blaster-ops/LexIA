@@ -37,7 +37,7 @@ def procesar_pdf_rag(ruta_archivo: str):
         documents = loader.load()
         
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
+            chunk_size=800,
             chunk_overlap=200
         )
         chunks = text_splitter.split_documents(documents)
@@ -86,7 +86,7 @@ def buscar_contexto(query: str) -> str:
     # Recuperar top 3 fragmentos con reintento automático
     while True:
         try:
-            docs = vectorstore.similarity_search(query, k=3)
+            docs = vectorstore.similarity_search(query, k=6)
             break
         except Exception as e:
             errores_limite = ["429", "RESOURCE_EXHAUSTED", "quota"]
