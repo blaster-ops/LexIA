@@ -45,7 +45,7 @@ def procesar_pdf_rag(ruta_archivo: str):
         if chunks:
             # Usar embeddings de Google (requiere API KEY configurada en entorno)
             embeddings = GoogleGenerativeAIEmbeddings(
-                model="models/text-embedding-004",
+                model="text-embedding-004",
                 google_api_key=os.getenv("GOOGLE_API_KEY"),
                 task_type="retrieval_document"
             )
@@ -77,7 +77,7 @@ def buscar_contexto(query: str) -> str:
     """Busca fragmentos relevantes en la base de vectores."""
     # Permitimos que las excepciones (como DB no encontrada) se propaguen
     embeddings = GoogleGenerativeAIEmbeddings(
-        model="models/text-embedding-004",
+        model="text-embedding-004",
         google_api_key=os.getenv("GOOGLE_API_KEY"),
         task_type="retrieval_document"
     )
