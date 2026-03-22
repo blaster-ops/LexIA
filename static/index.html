@@ -685,10 +685,11 @@
                     let textoLimpio = data.fragmento.replace(/[\r\n]+/g, ' ').trim();
                     let formatText = textoLimpio;
                     
-                    // Resaltar en negritas la frase exacta buscada
+                    // Resaltar en negritas la frase exacta buscada (tolerante a espacios)
                     if (keyword) {
-                        const regex = new RegExp(`(${keyword})`, 'gi');
-                        formatText = formatText.replace(regex, '<span style="font-weight: 900 !important; color: #1A365D; background-color: #E2E8F0; padding: 0 4px; border-radius: 3px;">$1</span>');
+                        const fraseSegura = keyword.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').split(/\s+/).join('\\s+');
+                        const regex = new RegExp(`(${fraseSegura})`, 'gi');
+                        formatText = formatText.replace(regex, '<mark style="background-color: #fef08a; color: #1e293b; font-weight: bold; padding: 2px 4px; border-radius: 4px;">$1</mark>');
                     }
                     
                     resultadoDiv.innerHTML = `
