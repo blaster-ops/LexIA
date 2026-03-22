@@ -99,13 +99,14 @@
 
         /* Chat Styles */
         #chat-container {
-            height: 350px;
+            max-height: 400px;
             overflow-y: auto;
             border: 1px solid var(--border-solid);
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 15px;
             background-color: #fafbfc;
+            flex-grow: 1;
         }
 
         .message {
@@ -365,7 +366,7 @@
                     <div class="card-header"> <!-- Distinct header for chat -->
                         <i class="fas fa-robot"></i> Tutor Virtual
                     </div>
-                    <div class="card-body d-flex flex-column">
+                    <div class="card-body d-flex flex-column justify-content-between h-100">
                         <div id="chat-container">
                             <div class="message message-ia">
                                 ¡Hola! Soy LexIA, tu asistente legal. ¿En qué puedo ayudarte hoy?
@@ -755,8 +756,10 @@
             const chatContainer = document.getElementById('chat-container');
             const div = document.createElement('div');
             div.className = `message message-${sender}`;
-            // Convertir saltos de línea a <br> para mejor formato en IA
-            div.innerHTML = text.replace(/\n/g, '<br>');
+            // Convertir saltos de línea a <br> y **texto** a negritas
+            let textoFormateado = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            textoFormateado = textoFormateado.replace(/\n/g, '<br>');
+            div.innerHTML = textoFormateado;
             chatContainer.appendChild(div);
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
