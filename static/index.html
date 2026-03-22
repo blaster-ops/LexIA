@@ -685,9 +685,10 @@
                     let textoLimpio = data.fragmento.replace(/[\r\n]+/g, ' ').trim();
                     let formatText = textoLimpio;
                     
-                    // Resaltar de amarillo la frase exacta buscada
+                    // Resaltar en negritas la frase exacta buscada
                     if (keyword) {
-                        formatText = formatText.replace(new RegExp(keyword, 'gi'), '<mark class="resaltado-ley">$&</mark>');
+                        const regex = new RegExp(`(${keyword})`, 'gi');
+                        formatText = formatText.replace(regex, '<strong>$1</strong>');
                     }
                     
                     resultadoDiv.innerHTML = `
