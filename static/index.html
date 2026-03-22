@@ -676,8 +676,9 @@
                 const data = await response.json();
 
                 if (data.encontrado) {
-                    // Mantener texto original (CSS white-space: pre-wrap controlará los saltos)
-                    let formatText = data.fragmento;
+                    // Limpieza de saltos de línea para que se lea como párrafo
+                    let textoLimpio = data.fragmento.replace(/[\r\n]+/g, ' ').trim();
+                    let formatText = textoLimpio;
                     
                     // Resaltar de amarillo la frase exacta buscada
                     if (keyword) {
@@ -687,7 +688,7 @@
                     resultadoDiv.innerHTML = `
                         <div class="result-box bg-white shadow rounded-3 mt-4 mb-2 p-4 border-0 border-start border-4 border-info">
                             <h6 class="text-primary fw-bold mb-3"><i class="fas fa-file-contract me-2"></i>Fragmento encontrado:</h6>
-                            <div class="text-dark" style="line-height: 1.5; text-align: justify; font-size: 0.95rem; white-space: pre-wrap; margin-top: 10px;">
+                            <div class="text-dark" style="line-height: 1.5; text-align: justify; font-size: 0.95rem; white-space: normal; margin-top: 10px;">
                                 <i>"${formatText}"</i>
                             </div>
                         </div>
