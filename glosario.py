@@ -100,3 +100,15 @@ class GestorGlosario:
         """
         self.terminos = []
         self._guardar_datos_archivo()
+
+    def borrar_termino(self, palabra: str) -> bool:
+        """
+        Elimina un término por su palabra y actualiza el archivo JSON.
+        Retorna True si se eliminó, False si no se encontró.
+        """
+        terminos_filtrados = [t for t in self.terminos if t.palabra != palabra]
+        if len(terminos_filtrados) != len(self.terminos):
+            self.terminos = terminos_filtrados
+            self._guardar_datos_archivo()
+            return True
+        return False

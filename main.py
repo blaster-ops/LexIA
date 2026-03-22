@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.staticfiles import StaticFiles
 import shutil
 import os
@@ -70,7 +70,7 @@ async def agregar_termino(termino: Termino):
     gestor_glosario.guardar_termino(termino)
     return termino
 
-@app.get("/terminos/", response_model=List[Termino])
+@app.get("/listar_terminos/", response_model=List[Termino])
 async def listar_terminos():
     """
     Devuelve todos los términos del glosario.
@@ -85,52 +85,95 @@ async def borrar_historial():
     gestor_glosario.limpiar_historial()
     return {"mensaje": "Historial eliminado correctamente"}
 
+@app.delete("/borrar_termino/{palabra}")
+async def borrar_termino(palabra: str):
+    """
+    Elimina un término específico del glosario.
+    """
+    if gestor_glosario.borrar_termino(palabra):
+        return {"mensaje": f"Término '{palabra}' eliminado correctamente."}
+    else:
+        raise HTTPException(status_code=404, detail="Término no encontrado.")
+
 @app.post("/buscar_en_pdf/")
-async def buscar_en_pdf(file: UploadFile = File(...), keyword: Optional[str] = None):
+async def buscar_en_pdf(file: Optional[UploadFile] = File(None), keyword: Optional[str] = Form(None), filename_filter: Optional[str] = Form(None)):
     """
-    Sube un archivo PDF, extrae su texto, lo indexa para RAG.
-    Si se proporciona una keyword, realiza una búsqueda simple (legacy).
+    Ruta corregida: Si hay una palabra clave, busca directamente en ChromaDB
+    sin reprocesar el PDF. Si no la hay y hay archivo, ingesta el documento.
     """
-    if not file.filename.lower().endswith('.pdf'):
-        raise HTTPException(status_code=400, detail="Error: Solo se permiten archivos PDF.")
+    # Importaciones necesarias de Langchain
+    from langchain_community.vectorstores import Chroma
+    from langchain_google_genai import GoogleGenerativeAIEmbeddings
     
-    # Guardar archivo temporalmente
-    temp_filename = f"temp_{file.filename}"
     try:
-        with open(temp_filename, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        
-        # Procesar PDF (Esto ahora también genera embeddings en ChromaDB)
-        texto_extraido = procesar_pdf(temp_filename)
-        
-        # Si NO hay keyword, terminamos aquí
-        if not keyword:
+        # Comportamiento 1: Búsqueda en la base de vectores (Lupa Legal)
+        if keyword:
+            print(f"DEBUG: Iniciando búsqueda rápida para '{keyword}' en ChromaDB... (Consumo estimado: 1 ticket)")
+            # 1. Solo inicializar conexión a base de datos existente
+            embeddings = GoogleGenerativeAIEmbeddings(
+                model="models/gemini-embedding-001",
+                google_api_key=os.getenv("GOOGLE_API_KEY"),
+                task_type="retrieval_document"
+            )
+            vectorstore = Chroma(
+                persist_directory="./chroma_db", 
+                embedding_function=embeddings
+            )
+            
+            # 2. Ejecutar similarity search directamente
+            if filename_filter and str(filename_filter).strip() and str(filename_filter).lower() not in ["none", "null", "undefined"]:
+                resultados = vectorstore.similarity_search(keyword, k=5, filter={'source': filename_filter})
+            else:
+                resultados = vectorstore.similarity_search(keyword, k=5)
+            
+            # 3. NO cargar, cortar ni procesar el PDF
+            if resultados:
+                fragmento = "\n\n".join([r.page_content for r in resultados])
+                
+                return {
+                    "keyword": keyword,
+                    "encontrado": True,
+                    "fragmento": fragmento,
+                    "documentos_extraidos": len(resultados),
+                    "busqueda_realizada": True
+                }
+            else:
+                return {
+                    "keyword": keyword,
+                    "encontrado": False,
+                    "fragmento": "No se encontraron similitudes en la base de datos.",
+                    "busqueda_realizada": True
+                }
+
+        # Comportamiento 2: Subida/Ingesta inicial de archivo PDF
+        elif file and file.filename.lower().endswith('.pdf'):
+            temp_filename = f"temp_{file.filename}"
+            with open(temp_filename, "wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+            
+            # Procesar y guardar lote en ChromaDB
+            procesar_pdf(temp_filename)
+            
+            if os.path.exists(temp_filename):
+                os.remove(temp_filename)
+                
             return {
                 "archivo": file.filename,
-                "mensaje": "Archivo subido y procesado correctamente para RAG.",
+                "mensaje": "Archivo subido y procesado correctamente en ChromaDB.",
                 "busqueda_realizada": False
             }
-
-        # Comportamiento legacy: Buscar palabra (Búsqueda simple)
-        resultado = buscar_palabra(texto_extraido, keyword)
-        
-        return {
-            "archivo": file.filename,
-            "keyword": keyword,
-            "encontrado": resultado is not None,
-            "fragmento": resultado if resultado else "No se encontró la palabra clave.",
-            "busqueda_realizada": True
-        }
+            
+        else:
+            raise HTTPException(status_code=400, detail="Debes enviar una palabra clave a buscar o un archivo PDF.")
             
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al procesar el archivo: {str(e)}")
-    finally:
-        # Limpiar archivo temporal
-        if os.path.exists(temp_filename):
-            os.remove(temp_filename)
+        import traceback
+        print("🔥 ERROR DETALLADO:")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error en la operación: {str(e)}")
 
 @app.post("/preguntar_tutor/")
-async def preguntar_tutor(pregunta: str):
+async def preguntar_tutor(pregunta: str, filename_filter: Optional[str] = None):
     """
     Responde preguntas usando el contexto de los PDFs subidos (RAG).
     Usa la nueva lógica centralizada en ingesta_pdf con Gemini 2.5 Flash.
@@ -139,7 +182,7 @@ async def preguntar_tutor(pregunta: str):
         raise HTTPException(status_code=400, detail="Error: La pregunta no puede estar vacía.")
 
     try:
-        respuesta = preguntar_al_tutor(pregunta)
+        respuesta = preguntar_al_tutor(pregunta, filename_filter)
         return {"respuesta": respuesta}
         
     except Exception as e:
@@ -149,3 +192,58 @@ async def preguntar_tutor(pregunta: str):
              raise HTTPException(status_code=400, detail="Error: Primero debes cargar un documento.")
         
         raise HTTPException(status_code=500, detail=f"Error en tutor IA: {str(e)}")
+
+@app.get("/listar_archivos/")
+async def listar_archivos():
+    """
+    Devuelve una lista de los nombres de archivo únicos guardados en ChromaDB.
+    """
+    from langchain_community.vectorstores import Chroma
+    from langchain_google_genai import GoogleGenerativeAIEmbeddings
+    try:
+        embeddings = GoogleGenerativeAIEmbeddings(
+            model="models/gemini-embedding-001",
+            google_api_key=os.getenv("GOOGLE_API_KEY"),
+            task_type="retrieval_document"
+        )
+        vectorstore = Chroma(persist_directory="./chroma_db", embedding_function=embeddings)
+        
+        # Obtener todos los documentos y extraer fuentes únicas
+        collection = vectorstore.get()
+        metadatas = collection.get("metadatas", [])
+        
+        archivos_unicos = set()
+        for meta in metadatas:
+            if meta and "source" in meta:
+                archivos_unicos.add(meta["source"])
+                
+        return {"archivos": list(archivos_unicos)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al listar archivos: {str(e)}")
+
+@app.delete("/borrar_archivo/{filename}")
+async def borrar_archivo(filename: str):
+    """
+    Elimina de ChromaDB todos los documentos cuya metadata 'source' coincida con 'filename'.
+    """
+    from langchain_community.vectorstores import Chroma
+    from langchain_google_genai import GoogleGenerativeAIEmbeddings
+    try:
+        embeddings = GoogleGenerativeAIEmbeddings(
+            model="models/gemini-embedding-001",
+            google_api_key=os.getenv("GOOGLE_API_KEY"),
+            task_type="retrieval_document"
+        )
+        vectorstore = Chroma(persist_directory="./chroma_db", embedding_function=embeddings)
+        
+        # Primero buscar IDs de los chunks a borrar
+        collection = vectorstore.get(where={"source": filename})
+        ids_to_delete = collection.get("ids", [])
+        
+        if not ids_to_delete:
+            return {"mensaje": f"No se encontró el archivo '{filename}' en la base de datos.", "eliminado": False}
+        
+        vectorstore.delete(ids=ids_to_delete)
+        return {"mensaje": f"Se eliminó el archivo '{filename}' ({len(ids_to_delete)} fragmentos).", "eliminado": True}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al borrar archivo: {str(e)}")

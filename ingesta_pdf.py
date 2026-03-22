@@ -36,28 +36,53 @@ def procesar_pdf_rag(ruta_archivo: str):
         loader = PyPDFLoader(ruta_archivo)
         documents = loader.load()
         
+        # Limpiar y normalizar el metadata 'source' para búsquedas posteriores
+        filename = os.path.basename(ruta_archivo)
+        if filename.startswith("temp_"):
+            filename = filename[5:]
+            
+        for doc in documents:
+            doc.metadata['source'] = filename
+        
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=800,
             chunk_overlap=200
         )
         chunks = text_splitter.split_documents(documents)
+        print(f"✅ Se leyeron y cortaron {len(chunks)} fragmentos del PDF.")
         
         if chunks:
             # Usar embeddings de Google (requiere API KEY configurada en entorno)
             embeddings = GoogleGenerativeAIEmbeddings(
-                model="text-embedding-004",
+                model="models/gemini-embedding-001",
                 google_api_key=os.getenv("GOOGLE_API_KEY"),
                 task_type="retrieval_document"
             )
             
-            # Guardar en disco
-            vectorstore = Chroma.from_documents(
-                documents=chunks,
-                embedding=embeddings,
-                persist_directory=PERSIST_DIRECTORY
-            )
-            # vectorstore.persist() # Chroma nuevo persiste auto
-            print(f"Guardados {len(chunks)} fragmentos en ChromaDB.")
+            # Guardar en disco en lotes
+            batch_size = 80
+            total_batches = (len(chunks) + batch_size - 1) // batch_size
+            
+            for i in range(0, len(chunks), batch_size):
+                lote = chunks[i:i + batch_size]
+                num_lote = (i // batch_size) + 1
+                
+                if num_lote == 1:
+                    vectorstore = Chroma.from_documents(
+                        documents=lote,
+                        embedding=embeddings,
+                        persist_directory=PERSIST_DIRECTORY
+                    )
+                else:
+                    vectorstore.add_documents(lote)
+                    
+                if num_lote < total_batches:
+                    print(f"Lote {num_lote}/{total_batches} guardado, esperando 60 segundos...")
+                    time.sleep(60)
+                else:
+                    print(f"Lote {num_lote}/{total_batches} guardado.")
+                    
+            print(f"Guardados {len(chunks)} fragmentos en ChromaDB en lotes de {batch_size}.")
     except Exception as e:
         print(f"Error procesando RAG: {e}")
 
@@ -73,11 +98,11 @@ def buscar_palabra(texto: str, keyword: str, contexto: int = 100) -> Optional[st
         return f"...{fragmento}..."
     return None
 
-def buscar_contexto(query: str) -> str:
+def buscar_contexto(query: str, filename_filter: Optional[str] = None) -> str:
     """Busca fragmentos relevantes en la base de vectores."""
     # Permitimos que las excepciones (como DB no encontrada) se propaguen
     embeddings = GoogleGenerativeAIEmbeddings(
-        model="text-embedding-004",
+        model="models/gemini-embedding-001",
         google_api_key=os.getenv("GOOGLE_API_KEY"),
         task_type="retrieval_document"
     )
@@ -86,7 +111,10 @@ def buscar_contexto(query: str) -> str:
     # Recuperar top 3 fragmentos con reintento automático
     while True:
         try:
-            docs = vectorstore.similarity_search(query, k=6)
+            if filename_filter:
+                docs = vectorstore.similarity_search(query, k=6, filter={"source": filename_filter})
+            else:
+                docs = vectorstore.similarity_search(query, k=6)
             break
         except Exception as e:
             errores_limite = ["429", "RESOURCE_EXHAUSTED", "quota"]
@@ -96,15 +124,19 @@ def buscar_contexto(query: str) -> str:
             else:
                 raise e
                 
+    print(f"🔍 Se encontraron {len(docs)} documentos relacionados.")
+    if docs:
+        print(f"📄 Fragmento 1 recuperado: {docs[0].page_content[:200]}...")
+
     contexto = "\n\n".join([d.page_content for d in docs])
     return contexto
 
-def preguntar_al_tutor(pregunta: str) -> str:
+def preguntar_al_tutor(pregunta: str, filename_filter: Optional[str] = None) -> str:
     """
     Genera una respuesta utilizando RAG y el modelo Gemini 2.5 Flash.
     Propaga excepciones si falla la búsqueda de contexto.
     """
-    contexto = buscar_contexto(pregunta)
+    contexto = buscar_contexto(pregunta, filename_filter)
     
     # Si no hay contexto, responder genéricamente o indicarlo
     if not contexto:
