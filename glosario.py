@@ -13,27 +13,13 @@ class Termino(BaseModel):
     materia: str
 
 class GestorGlosario:
-    def __init__(self, archivo_db: str = "base_datos_glosario.json"):
-        self.archivo_db = archivo_db
+    def __init__(self):
         try:
             # Se asume que GOOGLE_API_KEY está configurada en el entorno (main.py lo hace)
             self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
         except Exception as e:
             print(f"\n🔴 ERROR CRÍTICO DE IA: {e}\n") # Agrega esto
             self.llm = None
-        self.terminos: List[Termino] = self._cargar_datos()
-
-    def _cargar_datos(self) -> List[Termino]:
-        try:
-            with open(self.archivo_db, "r", encoding="utf-8") as f:
-                datos = json.load(f)
-                return [Termino(**t) for t in datos]
-        except (FileNotFoundError, json.JSONDecodeError):
-            return []
-
-    def _guardar_datos_archivo(self):
-        with open(self.archivo_db, "w", encoding="utf-8") as f:
-            json.dump([t.model_dump() for t in self.terminos], f, ensure_ascii=False, indent=4)
 
     def generar_enriquecimiento(self, termino: Termino):
         if not self.llm:
@@ -82,33 +68,3 @@ class GestorGlosario:
             
         except Exception as e:
             print(f"\n🔴 ERROR CRÍTICO DE IA: {e}\n") # Agrega esto
-
-    def guardar_termino(self, termino: Termino):
-        """
-        Enriquece el término con IA y lo guarda en la base de datos.
-        """
-        self.generar_enriquecimiento(termino)
-        self.terminos.append(termino)
-        self._guardar_datos_archivo()
-
-    def obtener_terminos(self) -> List[Termino]:
-        return self.terminos
-
-    def limpiar_historial(self):
-        """
-        Elimina todos los términos del historial.
-        """
-        self.terminos = []
-        self._guardar_datos_archivo()
-
-    def borrar_termino(self, palabra: str) -> bool:
-        """
-        Elimina un término por su palabra y actualiza el archivo JSON.
-        Retorna True si se eliminó, False si no se encontró.
-        """
-        terminos_filtrados = [t for t in self.terminos if t.palabra != palabra]
-        if len(terminos_filtrados) != len(self.terminos):
-            self.terminos = terminos_filtrados
-            self._guardar_datos_archivo()
-            return True
-        return False

@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import shutil
+import pymongo
 import os
 from typing import List, Optional
 import secrets
@@ -63,6 +64,11 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def servir_inicio():
     return FileResponse("static/index.html")
 
+# Conexión a MongoDB Atlas
+client = pymongo.MongoClient("mongodb+srv://2eigth:1022445511Aa.@cluster0.o8vaxuo.mongodb.net/?appName=Cluster0")
+db = client['lexia_db']
+coleccion_glosario = db['fichas']
+
 # Inicializar gestor de glosario
 gestor_glosario = GestorGlosario()
 
@@ -70,24 +76,26 @@ gestor_glosario = GestorGlosario()
 async def agregar_termino(termino: Termino):
     """
     Agrega un nuevo término al glosario.
-    Ahora genera automáticamente explicaciones sencillas y mnemotecnias con IA.
+    Genera automáticamente explicaciones sencillas y guarda en MongoDB.
     """
-    gestor_glosario.guardar_termino(termino)
+    gestor_glosario.generar_enriquecimiento(termino)
+    coleccion_glosario.insert_one(termino.model_dump())
     return termino
 
 @app.get("/listar_terminos/", response_model=List[Termino])
 async def listar_terminos():
     """
-    Devuelve todos los términos del glosario.
+    Devuelve todos los términos del glosario desde MongoDB.
     """
-    return gestor_glosario.obtener_terminos()
+    fichas = list(coleccion_glosario.find({}, {'_id': 0}))
+    return fichas
 
 @app.delete("/borrar_historial/")
 async def borrar_historial():
     """
-    Elimina todo el historial de términos generados.
+    Elimina todo el historial de términos generados en MongoDB.
     """
-    gestor_glosario.limpiar_historial()
+    coleccion_glosario.delete_many({})
     return {"mensaje": "Historial eliminado correctamente"}
 
 @app.delete("/borrar_termino/{palabra}")
@@ -95,7 +103,8 @@ async def borrar_termino(palabra: str):
     """
     Elimina un término específico del glosario.
     """
-    if gestor_glosario.borrar_termino(palabra):
+    resultado = coleccion_glosario.delete_one({'palabra': palabra})
+    if resultado.deleted_count > 0:
         return {"mensaje": f"Término '{palabra}' eliminado correctamente."}
     else:
         raise HTTPException(status_code=404, detail="Término no encontrado.")
