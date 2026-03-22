@@ -1,5 +1,6 @@
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 import shutil
 import os
 from typing import List, Optional
@@ -57,6 +58,10 @@ app.add_middleware(SecurityMiddleware)
 
 # Servir archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/")
+async def servir_inicio():
+    return FileResponse("static/index.html")
 
 # Inicializar gestor de glosario
 gestor_glosario = GestorGlosario()
