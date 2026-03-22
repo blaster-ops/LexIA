@@ -475,8 +475,13 @@
             const btn = document.querySelector('button[onclick="generarFicha()"]');
             const spinner = document.getElementById('spinnerGlosario');
             const resultadoDiv = document.getElementById('resultadoGlosario');
-            const palabra = document.getElementById('terminoPalabra').value;
-            const materia = document.getElementById('terminoMateria').value;
+            const palabra = document.getElementById('terminoPalabra').value.trim();
+            const materia = document.getElementById('terminoMateria').value.trim();
+
+            if (palabra === "" || materia === "") {
+                resultadoDiv.innerHTML = `<div class="alert alert-warning mt-3"><i class="fas fa-exclamation-triangle me-2"></i>Por favor, ingresa el término y la materia antes de generar la ficha.</div>`;
+                return;
+            }
 
             btn.disabled = true;
             spinner.style.display = 'inline-block';
