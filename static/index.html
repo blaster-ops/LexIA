@@ -503,7 +503,7 @@
                 const data = await response.json();
                 
                 // Formatear markdown de negritas para la mnemotecnia
-                const mnemotecniaFormat = data.mnemotecnia ? data.mnemotecnia.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') : '';
+                const mnemotecniaFormat = data.mnemotecnia ? data.mnemotecnia.replace(/\*{1,2}(.*?)\*{1,2}/g, '<strong>$1</strong>') : '';
 
                 resultadoDiv.innerHTML = `
                     <div class="result-box">
@@ -570,7 +570,7 @@
 
                 // Generar HTML de las tarjetas
                 contenedor.innerHTML = terms.map(term => {
-                    const mnemotecniaFormat = term.mnemotecnia ? term.mnemotecnia.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') : '';
+                    const mnemotecniaFormat = term.mnemotecnia ? term.mnemotecnia.replace(/\*{1,2}(.*?)\*{1,2}/g, '<strong>$1</strong>') : '';
                     return `
                         <div class="col-md-6 mb-3">
                             <div class="ficha-card">
@@ -688,7 +688,7 @@
                     // Resaltar en negritas la frase exacta buscada
                     if (keyword) {
                         const regex = new RegExp(`(${keyword})`, 'gi');
-                        formatText = formatText.replace(regex, '<strong>$1</strong>');
+                        formatText = formatText.replace(regex, '<span style="font-weight: 900 !important; color: #1A365D; background-color: #E2E8F0; padding: 0 4px; border-radius: 3px;">$1</span>');
                     }
                     
                     resultadoDiv.innerHTML = `
@@ -762,7 +762,7 @@
             const div = document.createElement('div');
             div.className = `message message-${sender}`;
             // Convertir saltos de línea a <br> y **texto** a negritas
-            let textoFormateado = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            let textoFormateado = text.replace(/\*{1,2}(.*?)\*{1,2}/g, '<strong>$1</strong>');
             textoFormateado = textoFormateado.replace(/\n/g, '<br>');
             div.innerHTML = textoFormateado;
             chatContainer.appendChild(div);
