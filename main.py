@@ -4,45 +4,10 @@ from fastapi.responses import FileResponse
 import shutil
 import pymongo
 import os
+import pymongo
+import os
 from typing import List, Optional
-import secrets
-import base64
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.requests import Request
-from starlette.responses import Response
 import google.generativeai as genai
-
-# --- BASE DE DATOS DE USUARIOS ---
-USERS_DB = {
-    "2eigth": "1022445511Aa",    # Usuario Administrador
-    "Miri": "200730"       # Usuario Invitado
-}
-
-class SecurityMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        auth_header = request.headers.get("Authorization")
-        
-        if not auth_header:
-            return Response("Unauthorized", status_code=401, headers={"WWW-Authenticate": "Basic"})
-        
-        try:
-            scheme, credentials = auth_header.split()
-            if scheme.lower() != 'basic':
-                return Response("Invalid authentication scheme", status_code=401, headers={"WWW-Authenticate": "Basic"})
-            
-            decoded = base64.b64decode(credentials).decode("ascii")
-            username, _, password = decoded.partition(":")
-            
-            if username in USERS_DB:
-                # Verificar contraseña de forma segura
-                is_correct = secrets.compare_digest(password, USERS_DB[username])
-                if is_correct:
-                    return await call_next(request)
-            
-            return Response("Invalid credentials", status_code=401, headers={"WWW-Authenticate": "Basic"})
-            
-        except Exception:
-            return Response("Invalid authorization header", status_code=401, headers={"WWW-Authenticate": "Basic"})
 
 # --- CONFIGURACIÓN ---
 os.environ["GOOGLE_API_KEY"] = "AIzaSyChHxqXdmyB-jK2PSt-N1tPtYaoJFLp4pI"
@@ -55,7 +20,6 @@ from ingesta_pdf import procesar_pdf, buscar_palabra, buscar_contexto, preguntar
 
 
 app = FastAPI(title="LexIA: Asistente Jurídico Inteligente")
-app.add_middleware(SecurityMiddleware)
 
 # Servir archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")

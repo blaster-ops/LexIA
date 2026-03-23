@@ -420,7 +420,7 @@
         async function cargarArchivos() {
             const select = document.getElementById('archivoActivo');
             try {
-                const response = await fetch('/listar_archivos/', { credentials: 'same-origin' });
+                const response = await fetch('/listar_archivos/');
                 const data = await response.json();
                 
                 // Limpiar opciones, dejando solo la opción por defecto
@@ -455,8 +455,7 @@
             
             try {
                 const response = await fetch(`/borrar_archivo/${encodeURIComponent(archivoSeleccionado)}`, {
-                    method: 'DELETE',
-                    credentials: 'same-origin'
+                    method: 'DELETE'
                 });
                 const data = await response.json();
                 
@@ -491,7 +490,6 @@
             try {
                 const response = await fetch('/agregar_termino/', {
                     method: 'POST',
-                    credentials: 'same-origin',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         palabra: palabra,
@@ -529,8 +527,7 @@
             const resultadoDiv = document.getElementById('resultadoGlosario');
             try {
                 const response = await fetch('/borrar_historial/', { 
-                    method: 'DELETE',
-                    credentials: 'same-origin'
+                    method: 'DELETE'
                 });
                 const data = await response.json();
                 resultadoDiv.innerHTML = `<div class="alert alert-success mt-2">${data.mensaje}</div>`;
@@ -564,7 +561,7 @@
             contenedor.innerHTML = '<div class="text-center w-100 py-4"><span class="spinner-border text-primary" role="status"></span><p class="mt-2 text-muted">Cargando fichas...</p></div>';
 
             try {
-                const response = await fetch('/listar_terminos/', { credentials: 'same-origin' });
+                const response = await fetch('/listar_terminos/');
                 if (!response.ok) throw new Error('Error al obtener las fichas');
                 const terms = await response.json();
                 
@@ -602,8 +599,7 @@
 
             try {
                 const response = await fetch('/borrar_termino/' + encodeURIComponent(palabra), {
-                    method: 'DELETE',
-                    credentials: 'same-origin'
+                    method: 'DELETE'
                 });
 
                 if (response.ok) {
@@ -641,7 +637,6 @@
             try {
                 const response = await fetch('/buscar_en_pdf/', {
                     method: 'POST',
-                    credentials: 'same-origin',
                     body: formData
                 });
 
@@ -682,7 +677,6 @@
             try {
                 const response = await fetch('/buscar_en_pdf/', {
                     method: 'POST',
-                    credentials: 'same-origin',
                     body: formData
                 });
 
@@ -744,8 +738,7 @@
                 }
 
                 const response = await fetch(url, {
-                    method: 'POST',
-                    credentials: 'same-origin'
+                    method: 'POST'
                 });
 
                 const data = await response.json();
