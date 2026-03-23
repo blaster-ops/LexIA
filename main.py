@@ -4,8 +4,7 @@ from fastapi.responses import FileResponse
 import shutil
 import pymongo
 import os
-import pymongo
-import os
+import certifi
 from typing import List, Optional
 import google.generativeai as genai
 
@@ -29,7 +28,8 @@ async def servir_inicio():
     return FileResponse("static/index.html")
 
 # Conexión a MongoDB Atlas
-client = pymongo.MongoClient("mongodb+srv://2eigth:1022445511Aa.@cluster0.o8vaxuo.mongodb.net/?appName=Cluster0")
+ca = certifi.where()
+client = pymongo.MongoClient("mongodb+srv://2eigth:1022445511Aa.@cluster0.o8vaxuo.mongodb.net/?appName=Cluster0", tlsCAFile=ca)
 db = client['lexia_db']
 coleccion_glosario = db['fichas']
 
