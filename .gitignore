@@ -1,6 +1,18 @@
+# Entornos virtuales
 venv/
+.env
+
+# Carpetas de compilación de PyInstaller (¡CRUCIALES!)
+dist/
+build/
+*.spec
+*.exe
+
+# Bases de datos y caché
+chroma_db/
 __pycache__/
 *.pyc
-.env
-chroma_db/
 .DS_Store
+
+# Datos locales
+*.json

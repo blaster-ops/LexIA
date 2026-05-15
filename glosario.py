@@ -1,9 +1,10 @@
 import json
 import os
+import asyncio
+from fastapi import HTTPException
 from typing import List, Optional
 from pydantic import BaseModel
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.prompts import PromptTemplate
+import httpx
 
 class Termino(BaseModel):
     palabra: str
@@ -14,20 +15,12 @@ class Termino(BaseModel):
 
 class GestorGlosario:
     def __init__(self):
-        try:
-            # Se asume que GOOGLE_API_KEY está configurada en el entorno (main.py lo hace)
-            self.llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
-        except Exception as e:
-            print(f"\n🔴 ERROR CRÍTICO DE IA: {e}\n") # Agrega esto
-            self.llm = None
+        # Ahora se usa el motor local de Ollama, no se requiere inicializar LLM globalmente.
+        pass
 
-    def generar_enriquecimiento(self, termino: Termino):
-        if not self.llm:
-            print("No hay conexión con LLM, saltando enriquecimiento.")
-            return
-
-        template = """
-        Actúa como LexIA, un experto en Derecho universal. Tu objetivo es proporcionar información jurídica rigurosa, clara y educativa. Para el término jurídico '{palabra}' correspondiente a la materia '{materia}':
+    async def generar_enriquecimiento(self, termino: Termino):
+        prompt_armado = f"""
+        Actúa como LexIA, un experto en Derecho universal. Tu objetivo es proporcionar información jurídica rigurosa, clara y educativa. Para el término jurídico '{termino.palabra}' correspondiente a la materia '{termino.materia}':
         1. Genera una definición técnica formal y rigurosa.
         2. Genera una explicación muy sencilla para un estudiante de primer año.
         3. Crea una mnemotecnia divertida o fácil de recordar.
@@ -39,17 +32,24 @@ class GestorGlosario:
             "mnemotecnia": "..."
         }}
         """
-        
-        prompt = PromptTemplate(
-            template=template,
-            input_variables=["palabra", "materia"]
-        )
-        
-        chain = prompt | self.llm
 
         try:
-            response = chain.invoke({"palabra": termino.palabra, "materia": termino.materia})
-            texto_respuesta = response.content.strip()
+            print("DEBUG: Enviando solicitud de enriquecimiento a Ollama (gemma4:e4b)...")
+            url = "http://localhost:11434/api/generate"
+            payload = {
+                "model": "gemma4:e4b",
+                "prompt": prompt_armado.strip(),
+                "stream": False,
+                "options": {"temperature": 0.0}
+            }
+            
+            async with httpx.AsyncClient(timeout=180.0) as client:
+                response = await client.post(url, json=payload)
+                response.raise_for_status()
+                data = response.json()
+                texto_respuesta = data.get("response", "").strip()
+                
+            print("DEBUG: Respuesta de enriquecimiento recibida de Ollama.")
             
             # Limpieza básica de markdown
             if "```json" in texto_respuesta:
@@ -66,5 +66,15 @@ class GestorGlosario:
             termino.explicacion_sencilla = datos_ia.get("explicacion_sencilla", termino.explicacion_sencilla)
             termino.mnemotecnia = datos_ia.get("mnemotecnia", termino.mnemotecnia)
             
+        except httpx.TimeoutException:
+            print("\n🔴 ERROR DE IA: Tiempo de espera agotado al consultar Ollama.\n")
+            raise HTTPException(
+                status_code=504, 
+                detail="Tiempo de espera agotado al consultar el modelo local Ollama. El servidor está tardando demasiado. Intente de nuevo."
+            )
         except Exception as e:
             print(f"\n🔴 ERROR CRÍTICO DE IA: {e}\n") # Agrega esto
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error interno al comunicarse con Ollama: {str(e)}"
+            )

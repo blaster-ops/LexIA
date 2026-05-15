@@ -1,3 +1,17 @@
+<!--
+=============================================================================
+Proyecto: LexIA - Asistente Jurídico Inteligente
+Autor y Titular de Propiedad Intelectual: José Miguel Tapia Adán
+Fecha de Creación: Mayo 2026
+Institución: Universidad Tecnológica de Tehuacán (UTT)
+
+Aviso Legal:
+El presente código es una obra original. El acceso al mismo se otorga
+exclusivamente para fines de evaluación académica. Queda estrictamente
+prohibida su copia, modificación, distribución, o apropiación por parte 
+de terceros sin autorización expresa.
+=============================================================================
+-->
 <!DOCTYPE html>
 <html lang="es">
 
@@ -31,7 +45,8 @@
             color: white;
             padding: 2rem 0;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Soft shadow */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            /* Soft shadow */
         }
 
         .card {
@@ -65,32 +80,40 @@
         .card-header i {
             color: var(--accent-color);
         }
-        
+
         /* Modificando los inputs y selects */
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             border: 1px solid var(--border-solid) !important;
             color: var(--text-primary);
             transition: all 0.3s ease;
         }
-        
+
         .form-control::placeholder {
             color: var(--text-secondary);
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--primary-color) !important;
             box-shadow: 0 0 0 0.2rem rgba(26, 54, 93, 0.25) !important;
         }
 
         /* Botones primarios */
-        .btn-custom-primary, .btn-primary, .btn-success, .btn-info {
+        .btn-custom-primary,
+        .btn-primary,
+        .btn-success,
+        .btn-info {
             background-color: var(--primary-color) !important;
             border-color: var(--primary-color) !important;
             color: #FFFFFF !important;
             transition: all 0.3s ease;
         }
 
-        .btn-custom-primary:hover, .btn-primary:hover, .btn-success:hover, .btn-info:hover {
+        .btn-custom-primary:hover,
+        .btn-primary:hover,
+        .btn-success:hover,
+        .btn-info:hover {
             background-color: var(--accent-color) !important;
             border-color: var(--accent-color) !important;
             color: #FFFFFF !important;
@@ -128,6 +151,24 @@
             color: var(--text-primary);
             margin-right: auto;
             border-bottom-left-radius: 2px;
+        }
+
+        .custom-spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .loading-spinner {
@@ -172,7 +213,7 @@
             max-height: 85vh;
             border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             display: flex;
             flex-direction: column;
         }
@@ -187,16 +228,19 @@
         #contenedor-fichas-guardadas::-webkit-scrollbar {
             width: 6px;
         }
+
         #contenedor-fichas-guardadas::-webkit-scrollbar-track {
-            background: #f1f1f1; 
+            background: #f1f1f1;
             border-radius: 4px;
         }
+
         #contenedor-fichas-guardadas::-webkit-scrollbar-thumb {
-            background: var(--text-secondary); 
+            background: var(--text-secondary);
             border-radius: 4px;
         }
+
         #contenedor-fichas-guardadas::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-color); 
+            background: var(--primary-color);
         }
 
         .ficha-card {
@@ -204,7 +248,7 @@
             border: 1px solid var(--border-solid);
             border-radius: 8px;
             padding: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
             transition: box-shadow 0.2s;
             height: 100%;
             display: flex;
@@ -213,7 +257,7 @@
         }
 
         .ficha-card:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         .btn-eliminar-ficha {
@@ -283,12 +327,15 @@
                                     placeholder="Ej: Penal, Civil...">
                             </div>
                             <div class="d-flex gap-2">
-                                <button type="button" onclick="generarFicha()" class="btn btn-primary w-100">
-                                    <span id="spinnerGlosario" class="spinner-border spinner-border-sm loading-spinner"
-                                        role="status"></span>
-                                    Generar Ficha
+                                <button type="button" onclick="generarFicha()" class="btn btn-primary w-100"
+                                    id="btnGenerarFicha">
+                                    <span id="spinnerGlosario" class="custom-spinner"></span>
+                                    <span id="textBtnGlosario">Generar Ficha</span>
                                 </button>
-                                <button type="button" onclick="abrirModalFichas()" class="btn w-100" style="background-color: #ffffff; color: #1A365D; border: 1px solid #1A365D; font-weight: 500; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#f8f9fa'" onmouseout="this.style.backgroundColor='#ffffff'">
+                                <button type="button" onclick="abrirModalFichas()" class="btn w-100"
+                                    style="background-color: #ffffff; color: #1A365D; border: 1px solid #1A365D; font-weight: 500; transition: all 0.3s ease;"
+                                    onmouseover="this.style.backgroundColor='#f8f9fa'"
+                                    onmouseout="this.style.backgroundColor='#ffffff'">
                                     📚 Ver Mis Fichas
                                 </button>
                             </div>
@@ -318,7 +365,7 @@
                             </div>
                         </div>
                         <hr>
-                        
+
                         <div class="mb-3">
                             <label for="pdfFile" class="form-label text-secondary">Cargar Nuevo Documento PDF</label>
                             <input class="form-control" type="file" id="pdfFile" accept="application/pdf">
@@ -346,8 +393,10 @@
                             <div class="input-group">
                                 <input type="text" class="form-control" id="keywordBusqueda"
                                     placeholder="Ej: Artículo 16...">
-                                <button class="btn btn-info text-white" type="button" onclick="buscarFragmento()">
-                                    <i class="fas fa-search"></i> Buscar
+                                <button class="btn btn-info text-white" type="button" onclick="buscarFragmento()"
+                                    id="btnLupaLegal">
+                                    <span id="spinnerLupa" class="custom-spinner"></span>
+                                    <span id="textBtnLupa"><i class="fas fa-search"></i> Buscar</span>
                                 </button>
                             </div>
                         </div>
@@ -361,7 +410,8 @@
 
             <!-- TARJETA 4: TUTOR VIRTUAL -->
             <div class="col-md-6" style="display: flex;">
-                <div class="card" style="height: fit-content !important; align-self: flex-start; width: 100%;"> <!-- Shadow gives it more depth -->
+                <div class="card" style="height: fit-content !important; align-self: flex-start; width: 100%;">
+                    <!-- Shadow gives it more depth -->
                     <div class="card-header"> <!-- Distinct header for chat -->
                         <i class="fas fa-robot"></i> Tutor Virtual
                     </div>
@@ -375,8 +425,9 @@
                             <div class="input-group">
                                 <input type="text" id="preguntaTutor" class="form-control"
                                     placeholder="Escribe tu duda jurídica aquí...">
-                                <button class="btn btn-primary" type="button" onclick="preguntarTutor()">
-                                    <i class="fas fa-paper-plane"></i>
+                                <button class="btn btn-primary" type="button" onclick="preguntarTutor()" id="btnTutor">
+                                    <span id="spinnerTutor" class="custom-spinner"></span>
+                                    <i class="fas fa-paper-plane" id="iconTutor"></i>
                                 </button>
                             </div>
                         </div>
@@ -391,7 +442,8 @@
     <footer class="bg-dark text-light py-4 mt-5" style="background-color: #1A365D !important;">
         <div class="container text-center">
             <p class="mb-0 text-white-50" style="font-size: 0.95rem;">
-                LexIA - Asistente Jurídico Inteligente. Desarrollado por Tapia | Ingeniería en Desarrollo de Software y Redes Digitales.
+                LexIA - Asistente Jurídico Inteligente. Desarrollado por Tapia | Ingeniería en Desarrollo de Software y
+                Redes Digitales.
             </p>
         </div>
     </footer>
@@ -420,12 +472,14 @@
         async function cargarArchivos() {
             const select = document.getElementById('archivoActivo');
             try {
-                const response = await fetch('/listar_archivos/');
+                const response = await fetch('/listar_archivos/', {
+                    headers: { 'ngrok-skip-browser-warning': '69420' }
+                });
                 const data = await response.json();
-                
+
                 // Limpiar opciones, dejando solo la opción por defecto
                 select.innerHTML = '<option value="">-- Todos los archivos --</option>';
-                
+
                 if (data.archivos && Array.isArray(data.archivos)) {
                     data.archivos.forEach(archivo => {
                         const option = document.createElement('option');
@@ -443,22 +497,23 @@
             const select = document.getElementById('archivoActivo');
             const archivoSeleccionado = select.value;
             const alertaDiv = document.getElementById('alertaPdf');
-            
+
             if (!archivoSeleccionado) {
                 alert("Primero selecciona un archivo de la lista para eliminarlo.");
                 return;
             }
-            
+
             if (!confirm(`¿Estás seguro de eliminar "${archivoSeleccionado}" de la base de memoria?`)) {
                 return;
             }
-            
+
             try {
                 const response = await fetch(`/borrar_archivo/${encodeURIComponent(archivoSeleccionado)}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: { 'ngrok-skip-browser-warning': '69420' }
                 });
                 const data = await response.json();
-                
+
                 if (response.ok) {
                     alertaDiv.innerHTML = `<div class="alert alert-success">✅ ${data.mensaje}</div>`;
                     cargarArchivos(); // Recargar la lista desplegable
@@ -472,8 +527,9 @@
 
         // --- TARJETA 1: GLOSARIO ---
         async function generarFicha() {
-            const btn = document.querySelector('button[onclick="generarFicha()"]');
+            const btn = document.getElementById('btnGenerarFicha');
             const spinner = document.getElementById('spinnerGlosario');
+            const textBtn = document.getElementById('textBtnGlosario');
             const resultadoDiv = document.getElementById('resultadoGlosario');
             const palabra = document.getElementById('terminoPalabra').value.trim();
             const materia = document.getElementById('terminoMateria').value.trim();
@@ -485,12 +541,16 @@
 
             btn.disabled = true;
             spinner.style.display = 'inline-block';
+            textBtn.innerText = 'Generando...';
             resultadoDiv.innerHTML = '';
 
             try {
                 const response = await fetch('/agregar_termino/', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'ngrok-skip-browser-warning': '69420'
+                    },
                     body: JSON.stringify({
                         palabra: palabra,
                         materia: materia,
@@ -501,7 +561,7 @@
                 if (!response.ok) throw new Error('Error al generar ficha');
 
                 const data = await response.json();
-                
+
                 // Formatear markdown de negritas para la mnemotecnia
                 const mnemotecniaFormat = data.mnemotecnia ? data.mnemotecnia.replace(/\*{1,2}(.*?)\*{1,2}/g, '<strong>$1</strong>') : '';
 
@@ -518,6 +578,7 @@
             } finally {
                 btn.disabled = false;
                 spinner.style.display = 'none';
+                textBtn.innerText = 'Generar Ficha';
             }
         }
 
@@ -526,8 +587,9 @@
 
             const resultadoDiv = document.getElementById('resultadoGlosario');
             try {
-                const response = await fetch('/borrar_historial/', { 
-                    method: 'DELETE'
+                const response = await fetch('/borrar_historial/', {
+                    method: 'DELETE',
+                    headers: { 'ngrok-skip-browser-warning': '69420' }
                 });
                 const data = await response.json();
                 resultadoDiv.innerHTML = `<div class="alert alert-success mt-2">${data.mensaje}</div>`;
@@ -550,7 +612,7 @@
         }
 
         // Cerrar modal al hacer clic fuera
-        document.getElementById('modalFichas').addEventListener('click', function(e) {
+        document.getElementById('modalFichas').addEventListener('click', function (e) {
             if (e.target === this) {
                 cerrarModalFichas();
             }
@@ -561,10 +623,12 @@
             contenedor.innerHTML = '<div class="text-center w-100 py-4"><span class="spinner-border text-primary" role="status"></span><p class="mt-2 text-muted">Cargando fichas...</p></div>';
 
             try {
-                const response = await fetch('/listar_terminos/');
+                const response = await fetch('/listar_terminos/', {
+                    headers: { 'ngrok-skip-browser-warning': '69420' }
+                });
                 if (!response.ok) throw new Error('Error al obtener las fichas');
                 const terms = await response.json();
-                
+
                 if (!Array.isArray(terms) || terms.length === 0) {
                     contenedor.innerHTML = '<div class="text-center w-100 py-5 text-muted"><i class="fas fa-folder-open mb-3" style="font-size: 3rem; color: #cbd5e1;"></i><p>Aún no tienes fichas guardadas en tu glosario.</p></div>';
                     return;
@@ -599,7 +663,8 @@
 
             try {
                 const response = await fetch('/borrar_termino/' + encodeURIComponent(palabra), {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: { 'ngrok-skip-browser-warning': '69420' }
                 });
 
                 if (response.ok) {
@@ -637,6 +702,7 @@
             try {
                 const response = await fetch('/buscar_en_pdf/', {
                     method: 'POST',
+                    headers: { 'ngrok-skip-browser-warning': '69420' },
                     body: formData
                 });
 
@@ -660,6 +726,9 @@
             const selectStr = document.getElementById('archivoActivo');
             const archivoActivo = selectStr ? selectStr.value : '';
             const resultadoDiv = document.getElementById('resultadoBusqueda');
+            const btn = document.getElementById('btnLupaLegal');
+            const spinner = document.getElementById('spinnerLupa');
+            const textBtn = document.getElementById('textBtnLupa');
 
             if (!keyword.trim()) {
                 alert("Ingresa una frase para buscar.");
@@ -667,6 +736,10 @@
             }
 
             resultadoDiv.innerHTML = '<div class="text-center text-muted"><small>Buscando...</small></div>';
+
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            textBtn.style.display = 'none';
 
             const formData = new FormData();
             formData.append('keyword', keyword);
@@ -677,6 +750,7 @@
             try {
                 const response = await fetch('/buscar_en_pdf/', {
                     method: 'POST',
+                    headers: { 'ngrok-skip-browser-warning': '69420' },
                     body: formData
                 });
 
@@ -686,14 +760,14 @@
                     // Limpieza de saltos de línea para que se lea como párrafo
                     let textoLimpio = data.fragmento.replace(/[\r\n]+/g, ' ').trim();
                     let formatText = textoLimpio;
-                    
+
                     // Resaltar en negritas la frase exacta buscada (tolerante a espacios)
                     if (keyword) {
                         const fraseSegura = keyword.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&').split(/\s+/).join('\\s+');
                         const regex = new RegExp(`(${fraseSegura})`, 'gi');
                         formatText = formatText.replace(regex, '<mark style="background-color: #fef08a; color: #1e293b; font-weight: bold; padding: 2px 4px; border-radius: 4px;">$1</mark>');
                     }
-                    
+
                     resultadoDiv.innerHTML = `
                         <div class="result-box bg-white shadow rounded-3 mt-4 mb-2 p-4 border-0 border-start border-4 border-info">
                             <h6 class="text-primary fw-bold mb-3"><i class="fas fa-file-contract me-2"></i>Fragmento encontrado:</h6>
@@ -707,6 +781,10 @@
                 }
             } catch (error) {
                 resultadoDiv.innerHTML = `<div class="alert alert-danger mt-2">Error en búsqueda.</div>`;
+            } finally {
+                btn.disabled = false;
+                spinner.style.display = 'none';
+                textBtn.style.display = 'inline-block';
             }
         }
 
@@ -715,7 +793,9 @@
             const input = document.getElementById('preguntaTutor');
             const chatContainer = document.getElementById('chat-container');
             const pregunta = input.value;
-            const btn = document.querySelector('button[onclick="preguntarTutor()"]');
+            const btn = document.getElementById('btnTutor');
+            const spinner = document.getElementById('spinnerTutor');
+            const icon = document.getElementById('iconTutor');
 
             if (!pregunta.trim()) return;
 
@@ -727,7 +807,10 @@
             const loadingId = 'loading-' + Date.now();
             chatContainer.innerHTML += `<div id="${loadingId}" class="message message-ia"><i class="fas fa-circle-notch fa-spin"></i> Consultando leyes...</div>`;
             chatContainer.scrollTop = chatContainer.scrollHeight;
+
             btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            icon.style.display = 'none';
 
             try {
                 let url = '/preguntar_tutor/?pregunta=' + encodeURIComponent(pregunta);
@@ -738,7 +821,8 @@
                 }
 
                 const response = await fetch(url, {
-                    method: 'POST'
+                    method: 'POST',
+                    headers: { 'ngrok-skip-browser-warning': '69420' }
                 });
 
                 const data = await response.json();
@@ -753,10 +837,12 @@
                 }
 
             } catch (error) {
-                document.getElementById(loadingId).remove();
+                document.getElementById(loadingId)?.remove();
                 appendMessage("Error de conexión. Intenta de nuevo.", 'ia');
             } finally {
                 btn.disabled = false;
+                spinner.style.display = 'none';
+                icon.style.display = 'inline-block';
             }
         }
 
@@ -783,10 +869,10 @@
         // Evento que carga la lista de archivos al iniciar la página y listeners dinámicos
         document.addEventListener('DOMContentLoaded', () => {
             cargarArchivos();
-            
+
             const selectArchivo = document.getElementById('archivoActivo');
             if (selectArchivo) {
-                selectArchivo.addEventListener('change', function() {
+                selectArchivo.addEventListener('change', function () {
                     const textoFiltro = document.getElementById('texto-filtro-lupa');
                     if (this.value) {
                         textoFiltro.innerHTML = '<i class="fas fa-search text-info"></i> 🔎 Buscando en: <strong>' + this.value + '</strong>';

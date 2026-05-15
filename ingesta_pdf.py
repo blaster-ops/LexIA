@@ -5,8 +5,8 @@ from pypdf import PdfReader
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
-from langchain_google_genai import GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI
-from langchain_core.prompts import PromptTemplate
+from langchain_huggingface import HuggingFaceEmbeddings
+import httpx
 import time
 
 # Configuración global para persistencia
@@ -19,7 +19,7 @@ def procesar_pdf(ruta_archivo: str) -> str:
         reader = PdfReader(ruta_archivo)
         texto_completo = ""
         for page in reader.pages:
-            texto_completo += page.extract_text() + "\n"
+            texto_completo += (page.extract_text() or "") + "\n"
     except Exception as e:
         print(f"Error lectura simple: {e}")
         texto_completo = ""
@@ -52,12 +52,8 @@ def procesar_pdf_rag(ruta_archivo: str):
         print(f"✅ Se leyeron y cortaron {len(chunks)} fragmentos del PDF.")
         
         if chunks:
-            # Usar embeddings de Google (requiere API KEY configurada en entorno)
-            embeddings = GoogleGenerativeAIEmbeddings(
-                model="models/gemini-embedding-001",
-                google_api_key=os.getenv("GOOGLE_API_KEY"),
-                task_type="retrieval_document"
-            )
+            # Usar embeddings locales de HuggingFace
+            embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'local_files_only': True})
             
             # Guardar en disco en lotes
             batch_size = 80
@@ -86,35 +82,57 @@ def procesar_pdf_rag(ruta_archivo: str):
     except Exception as e:
         print(f"Error procesando RAG: {e}")
 
-def buscar_palabra(texto: str, keyword: str, contexto: int = 100) -> Optional[str]:
-    """Legacy: búsqueda de palabra por string matching."""
-    if not texto or not keyword:
-        return None
-    match = re.search(re.escape(keyword), texto, re.IGNORECASE)
-    if match:
-        start = max(0, match.start() - contexto)
-        end = min(len(texto), match.end() + contexto)
-        fragmento = texto[start:end].replace('\n', ' ')
-        return f"...{fragmento}..."
-    return None
+def buscar_literal_en_pdf(ruta_archivo: str, keyword: str) -> str:
+    """Búsqueda literal (Lexical Search) exacta en PDF usando PyMuPDF."""
+    import fitz # PyMuPDF
+    if not os.path.exists(ruta_archivo):
+        return ""
+        
+    doc = fitz.open(ruta_archivo)
+    coincidencias = []
+    pattern = re.compile(re.escape(keyword), re.IGNORECASE)
+    
+    for page_num, page in enumerate(doc):
+        texto = page.get_text()
+        
+        for match in pattern.finditer(texto):
+            start = max(0, match.start() - 150)
+            end = min(len(texto), match.end() + 150)
+            
+            contexto_str = texto[start:end].replace('\n', ' ').strip()
+            
+            resultado = f"Página {page_num + 1}: ...{contexto_str}..."
+            coincidencias.append(resultado)
+            
+            if len(coincidencias) >= 20:
+                break
+        if len(coincidencias) >= 20:
+            break
+            
+    doc.close()
+    
+    if not coincidencias:
+        return ""
+        
+    return "<br><br>".join(coincidencias)
 
 def buscar_contexto(query: str, filename_filter: Optional[str] = None) -> str:
     """Busca fragmentos relevantes en la base de vectores."""
     # Permitimos que las excepciones (como DB no encontrada) se propaguen
-    embeddings = GoogleGenerativeAIEmbeddings(
-        model="models/gemini-embedding-001",
-        google_api_key=os.getenv("GOOGLE_API_KEY"),
-        task_type="retrieval_document"
-    )
+    embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'local_files_only': True})
     vectorstore = Chroma(persist_directory=PERSIST_DIRECTORY, embedding_function=embeddings)
     
-    # Recuperar top 3 fragmentos con reintento automático
+    # Configurar retriever
+    search_kwargs = {'k': 4}
+    if filename_filter:
+        search_kwargs['filter'] = {'source': filename_filter}
+        
+    retriever = vectorstore.as_retriever(search_type='similarity', search_kwargs=search_kwargs)
+    
+    # Recuperar fragmentos con reintento automático
     while True:
         try:
-            if filename_filter:
-                docs = vectorstore.similarity_search(query, k=6, filter={"source": filename_filter})
-            else:
-                docs = vectorstore.similarity_search(query, k=6)
+            docs_filtrados = retriever.invoke(query)
             break
         except Exception as e:
             errores_limite = ["429", "RESOURCE_EXHAUSTED", "quota"]
@@ -123,45 +141,58 @@ def buscar_contexto(query: str, filename_filter: Optional[str] = None) -> str:
                 time.sleep(60)
             else:
                 raise e
-                
-    print(f"🔍 Se encontraron {len(docs)} documentos relacionados.")
-    if docs:
-        print(f"📄 Fragmento 1 recuperado: {docs[0].page_content[:200]}...")
+    
+    print(f"🔍 Se devolverán los {len(docs_filtrados)} documentos más cercanos (sin filtro de umbral).")
+    if docs_filtrados:
+        print(f"📄 Fragmento 1 recuperado: {docs_filtrados[0].page_content[:200]}...")
 
-    contexto = "\n\n".join([d.page_content for d in docs])
+    contexto = "\n\n".join([d.page_content for d in docs_filtrados])
     return contexto
 
-def preguntar_al_tutor(pregunta: str, filename_filter: Optional[str] = None) -> str:
+async def preguntar_al_tutor(pregunta: str, filename_filter: Optional[str] = None) -> str:
     """
-    Genera una respuesta utilizando RAG y el modelo Gemini 2.5 Flash.
+    Genera una respuesta utilizando RAG y el modelo local Ollama (gemma4:e4b).
     Propaga excepciones si falla la búsqueda de contexto.
     """
-    contexto = buscar_contexto(pregunta, filename_filter)
+    from starlette.concurrency import run_in_threadpool
+    from langchain_community.llms import Ollama
+    from langchain_core.prompts import PromptTemplate
+    
+    contexto = await run_in_threadpool(buscar_contexto, pregunta, filename_filter)
     
     # Si no hay contexto, responder genéricamente o indicarlo
     if not contexto:
         contexto = "No se encontró información específica en los documentos proporcionados."
 
-    template = """
-    Eres LexIA, un experto en Derecho universal. Tu objetivo es proporcionar información jurídica rigurosa, clara y educativa para estudiantes y profesionales de cualquier país o institución. Utiliza el siguiente contexto para responder a la pregunta del estudiante.
-    Si la respuesta no se encuentra en el contexto, indícalo, pero intenta ayudar con tu conocimiento general si es posible, aclarando que no viene del documento.
+    template_str = """
+Eres LexIA, un experto en Derecho universal. Tu objetivo es proporcionar información jurídica rigurosa, clara y educativa para estudiantes y profesionales de cualquier país o institución. Utiliza el siguiente contexto para responder a la pregunta del estudiante.
+Si la respuesta no se encuentra en el contexto, indícalo, pero intenta ayudar con tu conocimiento general si es posible, aclarando que no viene del documento.
+
+Contexto:
+{contexto}
+
+Pregunta:
+{pregunta}
+"""
     
-    Contexto:
-    {contexto}
+    print("DEBUG: Enviando pregunta RAG a Ollama (gemma4:e4b)...")
     
-    Pregunta:
-    {pregunta}
-    """
-    
-    prompt = PromptTemplate(
-        template=template,
-        input_variables=["contexto", "pregunta"]
-    )
-    
-    # Usamos el modelo solicitado
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash")
-    
-    chain = prompt | llm
-    
-    response = chain.invoke({"contexto": contexto, "pregunta": pregunta})
-    return response.content.strip()
+    try:
+        # Configuración estricta del LLM como fue solicitado
+        llm = Ollama(model="gemma4:e4b", temperature=0.0)
+        
+        # Configurar la cadena
+        prompt = PromptTemplate(
+            template=template_str,
+            input_variables=["contexto", "pregunta"]
+        )
+        cadena = prompt | llm
+        
+        # Ejecutar invoke con contexto
+        respuesta = await run_in_threadpool(cadena.invoke, {"contexto": contexto, "pregunta": pregunta})
+            
+        print("DEBUG: Respuesta RAG de Ollama recibida.")
+        return respuesta.strip()
+    except Exception as e:
+        print(f"Error detallado: {e}")
+        raise Exception(f"Error interno al comunicarse con Ollama: {str(e)}")
