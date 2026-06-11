@@ -41,12 +41,20 @@ de terceros sin autorización expresa.
         }
 
         .main-header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 2rem 0;
+            background: #0f172a;
+            color: #ffffff;
+            padding: 2.5rem 0;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            /* Soft shadow */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border-bottom: 3px solid var(--accent-color);
+        }
+
+        .logo-principal {
+            max-height: 130px;
+            width: auto;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
         .card {
@@ -288,21 +296,245 @@ de terceros sin autorización expresa.
             margin-bottom: 8px;
             align-self: flex-start;
         }
+
+        /* Auth Modal Styles */
+        .modal-auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-auth-content {
+            background: #1e293b;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            text-align: center;
+        }
+
+        .auth-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .auth-tab {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: color 0.3s, border-bottom 0.3s;
+        }
+
+        .auth-tab.active {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+
+        .auth-input {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #ffffff;
+            border-radius: 6px;
+            padding: 12px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(197, 160, 89, 0.2);
+        }
+
+        .btn-auth {
+            background: var(--accent-color);
+            color: #0f172a;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            padding: 12px;
+            width: 100%;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-auth:hover {
+            background: #d4af37;
+        }
+
+        /* ====== MODAL CUSTOM (reemplaza alert/confirm nativos) ====== */
+        #customModalOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 99999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            animation: fadeInOverlay 0.2s ease;
+        }
+        #customModalOverlay.active { display: flex; }
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        #customModalBox {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            padding: 2rem 2rem 1.5rem;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+            text-align: center;
+            animation: slideInModal 0.25s ease;
+        }
+        @keyframes slideInModal {
+            from { transform: translateY(-20px); opacity: 0; }
+            to   { transform: translateY(0);     opacity: 1; }
+        }
+        #customModalIcon {
+            font-size: 2.2rem;
+            margin-bottom: 0.75rem;
+        }
+        #customModalTitle {
+            color: #f1f5f9;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        #customModalMsg {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+        .custom-modal-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        #customModalConfirm {
+            background: #e53e3e;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            padding: 9px 24px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+        #customModalConfirm:hover  { background: #c53030; transform: translateY(-1px); }
+        #customModalCancel {
+            background: #334155;
+            color: #cbd5e1;
+            border: none;
+            border-radius: 7px;
+            padding: 9px 24px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        #customModalCancel:hover { background: #475569; }
+        /* Modo alerta: solo botón OK */
+        #customModalCancel.hidden { display: none; }
+        #customModalConfirm.ok-mode {
+            background: var(--accent-color);
+            color: #0f172a;
+        }
+        #customModalConfirm.ok-mode:hover { background: #d4af37; }
     </style>
 </head>
 
 <body>
 
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal-auth-overlay">
+        <div class="modal-auth-content">
+            <img src="/static/LogoLexIA.png" alt="LexIA" style="max-height: 80px; margin-bottom: 20px;">
+            <h4 class="mb-4" style="color: var(--accent-color);">LexIA - Inicio de Sesión</h4>
+            
+            <div id="formLogin">
+                <input type="text" id="loginUsername" class="auth-input" placeholder="Nombre de usuario">
+                <input type="password" id="loginPassword" class="auth-input" placeholder="Contraseña">
+                <button onclick="login()" class="btn-auth" id="btnLogin">Entrar</button>
+                <div id="loginAlert" class="mt-3 text-danger small"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== MODAL CUSTOM (alert/confirm nativo reemplazado) ====== -->
+    <div id="customModalOverlay">
+        <div id="customModalBox">
+            <div id="customModalIcon">⚠️</div>
+            <div id="customModalTitle">Confirmación</div>
+            <div id="customModalMsg"></div>
+            <div class="custom-modal-btns">
+                <button id="customModalConfirm">Confirmar</button>
+                <button id="customModalCancel">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
-    <header class="main-header text-center">
-        <div class="container">
-            <h1><i class="fas fa-scale-balanced me-2"></i>LexIA</h1>
-            <p class="mb-0 text-white-50">Asistente Jurídico Inteligente</p>
+    <header class="main-header text-center" style="position: relative;">
+        <div class="container d-flex flex-column align-items-center justify-content-center" style="gap: 15px;">
+            <img src="/static/LogoLexIA.png" alt="Logo LexIA" class="logo-principal">
+            <p class="mb-0 fs-5" style="color: var(--accent-color); font-weight: 500; letter-spacing: 0.5px;">Asistente Jurídico Inteligente</p>
+        </div>
+        <div style="position: absolute; top: 15px; right: 20px; display: flex; gap: 10px;">
+            <button id="btnGestionarUsuarios" onclick="abrirModalUsuarios()" class="btn btn-sm btn-outline-warning" style="display: none;">
+                <i class="fas fa-users"></i> Gestionar Usuarios
+            </button>
+            <button onclick="cerrarSesion()" class="btn btn-sm btn-outline-light" style="border-color: rgba(255,255,255,0.2);">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
         </div>
     </header>
 
     <div class="container pb-5">
         <div class="row g-4">
+
+            <!-- TARJETA 0: ADMINISTRACIÓN (Oculta por defecto) -->
+            <div class="col-md-12" id="adminCard" style="display: none;">
+                <div class="card h-100" style="border-left: 4px solid var(--accent-color);">
+                    <div class="card-header bg-dark text-white">
+                        <i class="fas fa-user-shield" style="color: var(--accent-color);"></i> Panel de Administración - Alta de Usuarios
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-5">
+                                <input type="text" id="adminNewUser" class="form-control" placeholder="Nuevo Usuario">
+                            </div>
+                            <div class="col-md-5">
+                                <input type="password" id="adminNewPass" class="form-control" placeholder="Contraseña">
+                            </div>
+                            <div class="col-md-2">
+                                <button onclick="crearUsuarioAdmin()" class="btn btn-primary w-100" id="btnAdminCrear">
+                                    <i class="fas fa-plus"></i> Crear
+                                </button>
+                            </div>
+                        </div>
+                        <div id="adminAlert" class="mt-2 small"></div>
+                    </div>
+                </div>
+            </div>
 
             <!-- TARJETA 1: GLOSARIO INTELIGENTE -->
             <div class="col-md-6">
@@ -402,7 +634,7 @@ de terceros sin autorización expresa.
                         </div>
                         <div id="resultadoBusqueda"></div>
                         <div id="texto-filtro-lupa" class="alert alert-light border mt-2 small text-muted">
-                            <i class="fas fa-info-circle"></i> 🔎 Buscando en todos los documentos.
+                            <i class="fas fa-info-circle"></i> Buscando en todos los documentos.
                         </div>
                     </div>
                 </div>
@@ -442,8 +674,7 @@ de terceros sin autorización expresa.
     <footer class="bg-dark text-light py-4 mt-5" style="background-color: #1A365D !important;">
         <div class="container text-center">
             <p class="mb-0 text-white-50" style="font-size: 0.95rem;">
-                LexIA - Asistente Jurídico Inteligente. Desarrollado por Tapia | Ingeniería en Desarrollo de Software y
-                Redes Digitales.
+                LexIA - Asistente Jurídico Inteligente. Desarrollado por Emerald Systems.
             </p>
         </div>
     </footer>
@@ -461,6 +692,19 @@ de terceros sin autorización expresa.
         </div>
     </div>
 
+    <!-- Modal Gestionar Usuarios -->
+    <div id="modalAdminUsuarios" class="modal-fichas-overlay" style="display: none;">
+        <div class="modal-fichas-content" style="max-width: 500px;">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h4 class="text-primary mb-0"><i class="fas fa-users-cog me-2"></i>Gestión de Usuarios</h4>
+                <button onclick="cerrarModalUsuarios()" class="btn-close" aria-label="Close"></button>
+            </div>
+            <div id="contenedor-admin-usuarios" class="row g-3">
+                <!-- Aquí se inyectarán los usuarios -->
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -468,13 +712,322 @@ de terceros sin autorización expresa.
     <script>
         const API_URL = ""; // Relative path
 
+        // --- AUTHENTICATION LOGIC ---
+        function verificarAuth() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                document.getElementById('authModal').style.display = 'flex';
+                document.getElementById('adminCard').style.display = 'none';
+            } else {
+                document.getElementById('authModal').style.display = 'none';
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    if (payload.sub === '2eigth') {
+                        document.getElementById('adminCard').style.display = 'block';
+                        document.getElementById('btnGestionarUsuarios').style.display = 'inline-block';
+                    } else {
+                        document.getElementById('adminCard').style.display = 'none';
+                        if(document.getElementById('btnGestionarUsuarios')) document.getElementById('btnGestionarUsuarios').style.display = 'none';
+                    }
+                } catch(e) {
+                    document.getElementById('adminCard').style.display = 'none';
+                    if(document.getElementById('btnGestionarUsuarios')) document.getElementById('btnGestionarUsuarios').style.display = 'none';
+                }
+                cargarArchivos(); // Cargar datos iniciales una vez autenticado
+            }
+        }
+
+        function cambiarTabAuth(tab) {
+            document.getElementById('tabLogin').classList.remove('active');
+            document.getElementById('tabRegistro').classList.remove('active');
+            document.getElementById('formLogin').style.display = 'none';
+            document.getElementById('formRegistro').style.display = 'none';
+            
+            if (tab === 'login') {
+                document.getElementById('tabLogin').classList.add('active');
+                document.getElementById('formLogin').style.display = 'block';
+            } else {
+                document.getElementById('tabRegistro').classList.add('active');
+                document.getElementById('formRegistro').style.display = 'block';
+            }
+        }
+
+        // ======================================================
+        // MODAL CUSTOM (reemplaza confirm() y alert() nativos)
+        // ======================================================
+        function mostrarModal({ icono = '⚠️', titulo = 'Atención', mensaje = '', modo = 'confirm', onConfirm = () => {} }) {
+            const overlay  = document.getElementById('customModalOverlay');
+            const confirmBtn = document.getElementById('customModalConfirm');
+            const cancelBtn  = document.getElementById('customModalCancel');
+
+            document.getElementById('customModalIcon').textContent  = icono;
+            document.getElementById('customModalTitle').textContent = titulo;
+            document.getElementById('customModalMsg').textContent   = mensaje;
+
+            if (modo === 'alert') {
+                confirmBtn.textContent = 'Aceptar';
+                confirmBtn.classList.add('ok-mode');
+                cancelBtn.classList.add('hidden');
+            } else {
+                confirmBtn.textContent = 'Confirmar';
+                confirmBtn.classList.remove('ok-mode');
+                cancelBtn.classList.remove('hidden');
+            }
+
+            overlay.classList.add('active');
+
+            // Limpiar listeners anteriores clonando
+            const newConfirm = confirmBtn.cloneNode(true);
+            const newCancel  = cancelBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirm, confirmBtn);
+            cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+
+            // Si modo alert, copiar estilos manualmente
+            if (modo === 'alert') {
+                newConfirm.textContent = 'Aceptar';
+                newConfirm.classList.add('ok-mode');
+                newCancel.classList.add('hidden');
+            }
+
+            function cerrar() { overlay.classList.remove('active'); }
+
+            newConfirm.addEventListener('click', () => { cerrar(); onConfirm(); });
+            newCancel.addEventListener('click',  cerrar);
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) cerrar(); }, { once: true });
+        }
+
+        function alertaInfo(mensaje, titulo = 'Información') {
+            mostrarModal({ icono: 'ℹ️', titulo, mensaje, modo: 'alert', onConfirm: () => {} });
+        }
+
+        function alertaExito(mensaje, titulo = '¡Éxito!') {
+            mostrarModal({ icono: '✅', titulo, mensaje, modo: 'alert', onConfirm: () => {} });
+        }
+
+        function alertaError(mensaje, titulo = 'Error') {
+            mostrarModal({ icono: '❌', titulo, mensaje, modo: 'alert', onConfirm: () => {} });
+        }
+
+        function getAuthHeaders(extraHeaders = {}) {
+            const token = localStorage.getItem('access_token');
+            return {
+                'Authorization': 'Bearer ' + token,
+                'ngrok-skip-browser-warning': '69420',
+                ...extraHeaders
+            };
+        }
+
+        function checkAuthError(response) {
+            if (response.status === 401) {
+                cerrarSesion();
+                throw new Error("Sesión expirada o inválida. Por favor, inicia sesión de nuevo.");
+            }
+            return response;
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('access_token');
+            const userInp = document.getElementById('loginUsername');
+            const passInp = document.getElementById('loginPassword');
+            const alertDiv = document.getElementById('loginAlert');
+            if (userInp) userInp.value = '';
+            if (passInp) passInp.value = '';
+            if (alertDiv) alertDiv.innerText = '';
+            verificarAuth();
+        }
+
+        async function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const alertDiv = document.getElementById('loginAlert');
+            const btn = document.getElementById('btnLogin');
+
+            if (!username || !password) {
+                alertDiv.innerText = "Ingresa usuario y contraseña.";
+                return;
+            }
+
+            btn.disabled = true;
+            alertDiv.innerText = "Conectando...";
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('username', username);
+                formData.append('password', password);
+
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'ngrok-skip-browser-warning': '69420'
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    let errorMsg = "Error al iniciar sesión.";
+                    if (response.status === 401) {
+                        errorMsg = "Usuario o contraseña incorrectos";
+                    } else if (data.detail) {
+                        let rawMsg = typeof data.detail === 'string' ? data.detail : (data.detail[0]?.msg || JSON.stringify(data.detail));
+                        if (rawMsg.includes("Input should be a valid dictionary")) {
+                            errorMsg = "Error en el formato de los datos enviados";
+                        } else {
+                            errorMsg = rawMsg;
+                        }
+                    }
+                    alertDiv.innerText = errorMsg;
+                } else {
+                    localStorage.setItem('access_token', data.access_token);
+                    alertDiv.innerText = "";
+                    verificarAuth();
+                }
+            } catch (error) {
+                alertDiv.innerText = "Error de conexión.";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function crearUsuarioAdmin() {
+            const username = document.getElementById('adminNewUser').value.trim();
+            const password = document.getElementById('adminNewPass').value.trim();
+            const alertDiv = document.getElementById('adminAlert');
+            const btn = document.getElementById('btnAdminCrear');
+
+            if (!username || !password) {
+                alertDiv.className = "mt-2 text-danger small";
+                alertDiv.innerText = "Ingresa usuario y contraseña.";
+                return;
+            }
+
+            btn.disabled = true;
+            alertDiv.className = "mt-2 text-info small";
+            alertDiv.innerText = "Creando usuario...";
+
+            try {
+                const response = await fetch('/admin/crear_usuario', {
+                    method: 'POST',
+                    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alertDiv.className = "mt-2 text-danger small";
+                    let errorMsg = "Error al crear usuario.";
+                    if (response.status === 400) {
+                        errorMsg = "Este nombre de usuario ya está en uso.";
+                    } else if (response.status === 403) {
+                        errorMsg = "No tienes permisos de administrador para realizar esta acción.";
+                    } else if (data.detail) {
+                        let rawMsg = typeof data.detail === 'string' ? data.detail : (data.detail[0]?.msg || JSON.stringify(data.detail));
+                        errorMsg = rawMsg;
+                    }
+                    alertDiv.innerText = errorMsg;
+                } else {
+                    alertDiv.className = "mt-2 text-success small fw-bold";
+                    alertDiv.innerText = "¡Usuario creado con éxito! Carpetas preparadas.";
+                    document.getElementById('adminNewUser').value = '';
+                    document.getElementById('adminNewPass').value = '';
+                }
+            } catch (error) {
+                alertDiv.className = "mt-2 text-danger small";
+                alertDiv.innerText = "Error de conexión.";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // --- MODAL ADMIN USUARIOS ---
+        function abrirModalUsuarios() {
+            document.getElementById('modalAdminUsuarios').style.display = 'flex';
+            cargarUsuariosAdmin();
+        }
+
+        function cerrarModalUsuarios() {
+            document.getElementById('modalAdminUsuarios').style.display = 'none';
+        }
+
+        document.getElementById('modalAdminUsuarios').addEventListener('click', function (e) {
+            if (e.target === this) {
+                cerrarModalUsuarios();
+            }
+        });
+
+        async function cargarUsuariosAdmin() {
+            const contenedor = document.getElementById('contenedor-admin-usuarios');
+            contenedor.innerHTML = '<div class="text-center w-100 py-4"><span class="spinner-border text-primary" role="status"></span><p class="mt-2 text-muted">Cargando usuarios...</p></div>';
+
+            try {
+                const response = await fetch('/admin/usuarios', {
+                    headers: getAuthHeaders()
+                });
+                if (!response.ok) throw new Error('Error al obtener la lista de usuarios');
+                const users = await response.json();
+
+                if (!Array.isArray(users) || users.length === 0) {
+                    contenedor.innerHTML = '<div class="text-center w-100 py-3 text-muted"><p>No hay usuarios registrados.</p></div>';
+                    return;
+                }
+
+                let html = '<ul class="list-group w-100">';
+                users.forEach(user => {
+                    html += `
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-user text-secondary me-2"></i> <strong>${user}</strong></span>
+                            ${user === '2eigth' ? 
+                                '<span class="badge bg-success">Admin</span>' : 
+                                `<button onclick="borrarUsuarioAdmin('${user}')" class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i> Eliminar</button>`
+                            }
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+                contenedor.innerHTML = html;
+
+            } catch (error) {
+                contenedor.innerHTML = `<div class="alert alert-danger w-100 m-3">Error al cargar usuarios: ${error.message}</div>`;
+            }
+        }
+
+        async function borrarUsuarioAdmin(username) {
+            mostrarModal({
+                icono: '⛔',
+                titulo: 'Eliminar usuario',
+                mensaje: `PELIGRO: ¿Estás seguro de que deseas eliminar permanentemente a "${username}" y TODOS sus archivos subidos? Esta acción no se puede deshacer.`,
+                modo: 'confirm',
+                onConfirm: async () => {
+                    try {
+                        const response = await fetch(`/admin/borrar_usuario/${encodeURIComponent(username)}`, {
+                            method: 'DELETE',
+                            headers: getAuthHeaders()
+                        });
+                        const data = await response.json();
+                        if (response.ok) {
+                            alertaExito(data.mensaje || 'Usuario eliminado con éxito.');
+                            cargarUsuariosAdmin();
+                        } else {
+                            alertaError('Error: ' + (data.detail || 'No se pudo eliminar al usuario'));
+                        }
+                    } catch (error) {
+                        alertaError('Error de conexión al eliminar el usuario');
+                    }
+                }
+            });
+        }
+
         // --- GESTIÓN DE ARCHIVOS ---
         async function cargarArchivos() {
             const select = document.getElementById('archivoActivo');
             try {
                 const response = await fetch('/listar_archivos/', {
-                    headers: { 'ngrok-skip-browser-warning': '69420' }
+                    headers: getAuthHeaders()
                 });
+                checkAuthError(response);
                 const data = await response.json();
 
                 // Limpiar opciones, dejando solo la opción por defecto
@@ -499,30 +1052,34 @@ de terceros sin autorización expresa.
             const alertaDiv = document.getElementById('alertaPdf');
 
             if (!archivoSeleccionado) {
-                alert("Primero selecciona un archivo de la lista para eliminarlo.");
+                alertaError('Primero selecciona un archivo de la lista para eliminarlo.', 'Sin selección');
                 return;
             }
 
-            if (!confirm(`¿Estás seguro de eliminar "${archivoSeleccionado}" de la base de memoria?`)) {
-                return;
-            }
-
-            try {
-                const response = await fetch(`/borrar_archivo/${encodeURIComponent(archivoSeleccionado)}`, {
-                    method: 'DELETE',
-                    headers: { 'ngrok-skip-browser-warning': '69420' }
-                });
-                const data = await response.json();
-
-                if (response.ok) {
-                    alertaDiv.innerHTML = `<div class="alert alert-success">✅ ${data.mensaje}</div>`;
-                    cargarArchivos(); // Recargar la lista desplegable
-                } else {
-                    alertaDiv.innerHTML = `<div class="alert alert-danger">Error: ${data.detail || data.mensaje}</div>`;
+            mostrarModal({
+                icono: '🗑️',
+                titulo: 'Eliminar archivo',
+                mensaje: `¿Estás seguro de eliminar "${archivoSeleccionado}" de la base de memoria? Esta acción no se puede deshacer.`,
+                modo: 'confirm',
+                onConfirm: async () => {
+                    try {
+                        const response = await fetch(`/borrar_archivo/${encodeURIComponent(archivoSeleccionado)}`, {
+                            method: 'DELETE',
+                            headers: getAuthHeaders()
+                        });
+                        checkAuthError(response);
+                        const data = await response.json();
+                        if (response.ok) {
+                            alertaDiv.innerHTML = `<div class="alert alert-success">✅ ${data.mensaje}</div>`;
+                            cargarArchivos();
+                        } else {
+                            alertaDiv.innerHTML = `<div class="alert alert-danger">Error: ${data.detail || data.mensaje}</div>`;
+                        }
+                    } catch (error) {
+                        alertaDiv.innerHTML = `<div class="alert alert-danger">Error de conexión al eliminar.</div>`;
+                    }
                 }
-            } catch (error) {
-                alertaDiv.innerHTML = `<div class="alert alert-danger">Error de conexión al eliminar.</div>`;
-            }
+            });
         }
 
         // --- TARJETA 1: GLOSARIO ---
@@ -547,10 +1104,7 @@ de terceros sin autorización expresa.
             try {
                 const response = await fetch('/agregar_termino/', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'ngrok-skip-browser-warning': '69420'
-                    },
+                    headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
                     body: JSON.stringify({
                         palabra: palabra,
                         materia: materia,
@@ -583,22 +1137,27 @@ de terceros sin autorización expresa.
         }
 
         async function borrarHistorial() {
-            if (!confirm("¿Estás seguro de que quieres borrar todo el historial del glosario?")) return;
-
-            const resultadoDiv = document.getElementById('resultadoGlosario');
-            try {
-                const response = await fetch('/borrar_historial/', {
-                    method: 'DELETE',
-                    headers: { 'ngrok-skip-browser-warning': '69420' }
-                });
-                const data = await response.json();
-                resultadoDiv.innerHTML = `<div class="alert alert-success mt-2">${data.mensaje}</div>`;
-                // Limpiar inputs
-                document.getElementById('terminoPalabra').value = '';
-                document.getElementById('terminoMateria').value = '';
-            } catch (error) {
-                alert("Error al borrar historial");
-            }
+            mostrarModal({
+                icono: '🗑️',
+                titulo: 'Borrar historial del glosario',
+                mensaje: '¿Estás seguro de que quieres borrar todo el historial del glosario? Esta acción no se puede deshacer.',
+                modo: 'confirm',
+                onConfirm: async () => {
+                    const resultadoDiv = document.getElementById('resultadoGlosario');
+                    try {
+                        const response = await fetch('/borrar_historial/', {
+                            method: 'DELETE',
+                            headers: getAuthHeaders()
+                        });
+                        const data = await response.json();
+                        resultadoDiv.innerHTML = `<div class="alert alert-success mt-2">${data.mensaje}</div>`;
+                        document.getElementById('terminoPalabra').value = '';
+                        document.getElementById('terminoMateria').value = '';
+                    } catch (error) {
+                        alertaError('Error al borrar historial');
+                    }
+                }
+            });
         }
 
         // --- MODAL MIS FICHAS ---
@@ -624,7 +1183,7 @@ de terceros sin autorización expresa.
 
             try {
                 const response = await fetch('/listar_terminos/', {
-                    headers: { 'ngrok-skip-browser-warning': '69420' }
+                    headers: getAuthHeaders()
                 });
                 if (!response.ok) throw new Error('Error al obtener las fichas');
                 const terms = await response.json();
@@ -659,24 +1218,28 @@ de terceros sin autorización expresa.
         }
 
         async function eliminarFicha(palabra) {
-            if (!confirm(`¿Estás seguro de que deseas eliminar la ficha de "${palabra}"?`)) return;
-
-            try {
-                const response = await fetch('/borrar_termino/' + encodeURIComponent(palabra), {
-                    method: 'DELETE',
-                    headers: { 'ngrok-skip-browser-warning': '69420' }
-                });
-
-                if (response.ok) {
-                    // Recargar tarjetas para que desaparezca la eliminada
-                    cargarFichasGuardadas();
-                } else {
-                    const data = await response.json();
-                    alert(data.detail || "Error al eliminar la ficha");
+            mostrarModal({
+                icono: '🗑️',
+                titulo: 'Eliminar ficha',
+                mensaje: `¿Estás seguro de que deseas eliminar la ficha de "${palabra}"?`,
+                modo: 'confirm',
+                onConfirm: async () => {
+                    try {
+                        const response = await fetch('/borrar_termino/' + encodeURIComponent(palabra), {
+                            method: 'DELETE',
+                            headers: getAuthHeaders()
+                        });
+                        if (response.ok) {
+                            cargarFichasGuardadas();
+                        } else {
+                            const data = await response.json();
+                            alertaError(data.detail || 'Error al eliminar la ficha');
+                        }
+                    } catch (error) {
+                        alertaError('Error de conexión al eliminar la ficha');
+                    }
                 }
-            } catch (error) {
-                alert("Error de conexión al eliminar la ficha");
-            }
+            });
         }
 
         // --- TARJETA 2: MEMORIZAR PDF ---
@@ -702,9 +1265,10 @@ de terceros sin autorización expresa.
             try {
                 const response = await fetch('/buscar_en_pdf/', {
                     method: 'POST',
-                    headers: { 'ngrok-skip-browser-warning': '69420' },
+                    headers: getAuthHeaders(),
                     body: formData
                 });
+                checkAuthError(response);
 
                 const data = await response.json();
 
@@ -750,9 +1314,10 @@ de terceros sin autorización expresa.
             try {
                 const response = await fetch('/buscar_en_pdf/', {
                     method: 'POST',
-                    headers: { 'ngrok-skip-browser-warning': '69420' },
+                    headers: getAuthHeaders(),
                     body: formData
                 });
+                checkAuthError(response);
 
                 const data = await response.json();
 
@@ -822,8 +1387,9 @@ de terceros sin autorización expresa.
 
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'ngrok-skip-browser-warning': '69420' }
+                    headers: getAuthHeaders()
                 });
+                checkAuthError(response);
 
                 const data = await response.json();
 
@@ -868,16 +1434,16 @@ de terceros sin autorización expresa.
 
         // Evento que carga la lista de archivos al iniciar la página y listeners dinámicos
         document.addEventListener('DOMContentLoaded', () => {
-            cargarArchivos();
+            verificarAuth();
 
             const selectArchivo = document.getElementById('archivoActivo');
             if (selectArchivo) {
                 selectArchivo.addEventListener('change', function () {
                     const textoFiltro = document.getElementById('texto-filtro-lupa');
                     if (this.value) {
-                        textoFiltro.innerHTML = '<i class="fas fa-search text-info"></i> 🔎 Buscando en: <strong>' + this.value + '</strong>';
+                        textoFiltro.innerHTML = '<i class="fas fa-search text-info"></i> Buscando en: <strong>' + this.value + '</strong>';
                     } else {
-                        textoFiltro.innerHTML = '<i class="fas fa-info-circle"></i> 🔎 Buscando en todos los documentos.';
+                        textoFiltro.innerHTML = '<i class="fas fa-info-circle"></i> Buscando en todos los documentos.';
                     }
                 });
             }

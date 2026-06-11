@@ -9,10 +9,25 @@ from langchain_huggingface import HuggingFaceEmbeddings
 import httpx
 import time
 
-# Configuración global para persistencia
-PERSIST_DIRECTORY = "./chroma_db"
+def print(*args, **kwargs):
+    import sys
+    import builtins
+    safe_args = []
+    for arg in args:
+        if isinstance(arg, str):
+            safe_args.append(arg.encode('ascii', 'backslashreplace').decode('ascii'))
+        else:
+            safe_args.append(arg)
+    try:
+        if sys.stdout is not None:
+            builtins.print(*safe_args, **kwargs)
+    except Exception:
+        pass
 
-def procesar_pdf(ruta_archivo: str) -> str:
+
+
+
+def procesar_pdf(ruta_archivo: str, username: str) -> str:
     """Extrae texto simple (legacy) y procesa para RAG."""
     # Extracción simple para compatibilidad
     try:
@@ -26,11 +41,11 @@ def procesar_pdf(ruta_archivo: str) -> str:
         
     # Procesamiento RAG
     print(f"Procesando RAG para: {ruta_archivo}")
-    procesar_pdf_rag(ruta_archivo)
+    procesar_pdf_rag(ruta_archivo, username)
     
     return texto_completo
 
-def procesar_pdf_rag(ruta_archivo: str):
+def procesar_pdf_rag(ruta_archivo: str, username: str):
     """Divide el PDF en chunks y guarda embeddings en ChromaDB."""
     try:
         loader = PyPDFLoader(ruta_archivo)
@@ -49,7 +64,7 @@ def procesar_pdf_rag(ruta_archivo: str):
             chunk_overlap=200
         )
         chunks = text_splitter.split_documents(documents)
-        print(f"✅ Se leyeron y cortaron {len(chunks)} fragmentos del PDF.")
+        print(f"[OK] Se leyeron y cortaron {len(chunks)} fragmentos del PDF.")
         
         if chunks:
             # Usar embeddings locales de HuggingFace
@@ -67,7 +82,7 @@ def procesar_pdf_rag(ruta_archivo: str):
                     vectorstore = Chroma.from_documents(
                         documents=lote,
                         embedding=embeddings,
-                        persist_directory=PERSIST_DIRECTORY
+                        persist_directory=f"./data/users/{username}/chroma_db"
                     )
                 else:
                     vectorstore.add_documents(lote)
@@ -116,11 +131,12 @@ def buscar_literal_en_pdf(ruta_archivo: str, keyword: str) -> str:
         
     return "<br><br>".join(coincidencias)
 
-def buscar_contexto(query: str, filename_filter: Optional[str] = None) -> str:
+def buscar_contexto(query: str, username: str, filename_filter: Optional[str] = None) -> str:
     """Busca fragmentos relevantes en la base de vectores."""
     # Permitimos que las excepciones (como DB no encontrada) se propaguen
     embeddings = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2", model_kwargs={'local_files_only': True})
-    vectorstore = Chroma(persist_directory=PERSIST_DIRECTORY, embedding_function=embeddings)
+    user_chroma_dir = f"./data/users/{username}/chroma_db"
+    vectorstore = Chroma(persist_directory=user_chroma_dir, embedding_function=embeddings)
     
     # Configurar retriever
     search_kwargs = {'k': 4}
@@ -129,27 +145,29 @@ def buscar_contexto(query: str, filename_filter: Optional[str] = None) -> str:
         
     retriever = vectorstore.as_retriever(search_type='similarity', search_kwargs=search_kwargs)
     
-    # Recuperar fragmentos con reintento automático
-    while True:
+    # C-3: Recuperar fragmentos con reintento limitado (máx. 3 intentos)
+    errores_limite = ["429", "RESOURCE_EXHAUSTED", "quota"]
+    max_reintentos = 3
+    docs_filtrados = []
+    for intento in range(max_reintentos):
         try:
             docs_filtrados = retriever.invoke(query)
             break
         except Exception as e:
-            errores_limite = ["429", "RESOURCE_EXHAUSTED", "quota"]
-            if any(err in str(e) for err in errores_limite):
-                print("⚠️ Cuota excedida. Esperando 60 segundos para reintentar...")
+            if any(err in str(e) for err in errores_limite) and intento < max_reintentos - 1:
+                print(f"[AVISO] Cuota excedida (intento {intento + 1}/{max_reintentos}). Esperando 60 segundos...")
                 time.sleep(60)
             else:
                 raise e
     
-    print(f"🔍 Se devolverán los {len(docs_filtrados)} documentos más cercanos (sin filtro de umbral).")
+    print(f"[BUSQUEDA] Se devolvera(n) {len(docs_filtrados)} documento(s) mas cercanos.")
     if docs_filtrados:
-        print(f"📄 Fragmento 1 recuperado: {docs_filtrados[0].page_content[:200]}...")
+        print(f"[FRAGMENTO] Fragmento 1 recuperado: {docs_filtrados[0].page_content[:200]}...")
 
     contexto = "\n\n".join([d.page_content for d in docs_filtrados])
     return contexto
 
-async def preguntar_al_tutor(pregunta: str, filename_filter: Optional[str] = None) -> str:
+async def preguntar_al_tutor(pregunta: str, username: str, filename_filter: Optional[str] = None) -> str:
     """
     Genera una respuesta utilizando RAG y el modelo local Ollama (gemma4:e4b).
     Propaga excepciones si falla la búsqueda de contexto.
@@ -158,7 +176,7 @@ async def preguntar_al_tutor(pregunta: str, filename_filter: Optional[str] = Non
     from langchain_community.llms import Ollama
     from langchain_core.prompts import PromptTemplate
     
-    contexto = await run_in_threadpool(buscar_contexto, pregunta, filename_filter)
+    contexto = await run_in_threadpool(buscar_contexto, pregunta, username, filename_filter)
     
     # Si no hay contexto, responder genéricamente o indicarlo
     if not contexto:

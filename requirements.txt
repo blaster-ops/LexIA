@@ -7,3 +7,6 @@ langchain-community
 langchain-huggingface
 sentence-transformers
 pymupdf
+sqlalchemy
+bcrypt
+pyjwt

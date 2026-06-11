@@ -6,6 +6,22 @@ from typing import List, Optional
 from pydantic import BaseModel
 import httpx
 
+def print(*args, **kwargs):
+    import sys
+    import builtins
+    safe_args = []
+    for arg in args:
+        if isinstance(arg, str):
+            safe_args.append(arg.encode('ascii', 'backslashreplace').decode('ascii'))
+        else:
+            safe_args.append(arg)
+    try:
+        if sys.stdout is not None:
+            builtins.print(*safe_args, **kwargs)
+    except Exception:
+        pass
+
+
 class Termino(BaseModel):
     palabra: str
     definicion_tecnica: str
@@ -67,13 +83,13 @@ class GestorGlosario:
             termino.mnemotecnia = datos_ia.get("mnemotecnia", termino.mnemotecnia)
             
         except httpx.TimeoutException:
-            print("\n🔴 ERROR DE IA: Tiempo de espera agotado al consultar Ollama.\n")
+            print("\n[ERROR IA] Tiempo de espera agotado al consultar Ollama.\n")
             raise HTTPException(
                 status_code=504, 
                 detail="Tiempo de espera agotado al consultar el modelo local Ollama. El servidor está tardando demasiado. Intente de nuevo."
             )
         except Exception as e:
-            print(f"\n🔴 ERROR CRÍTICO DE IA: {e}\n") # Agrega esto
+            print(f"\n[ERROR CRITICO IA] {e}\n")
             raise HTTPException(
                 status_code=500,
                 detail=f"Error interno al comunicarse con Ollama: {str(e)}"
