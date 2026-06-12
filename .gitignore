@@ -16,3 +16,8 @@ __pycache__/
 
 # Datos locales
 *.json
+
+# Bases de datos SQLite y datos de usuarios
+data/
+*.db
+*.sqlite

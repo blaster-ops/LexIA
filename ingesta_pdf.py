@@ -169,7 +169,7 @@ def buscar_contexto(query: str, username: str, filename_filter: Optional[str] = 
 
 async def preguntar_al_tutor(pregunta: str, username: str, filename_filter: Optional[str] = None) -> str:
     """
-    Genera una respuesta utilizando RAG y el modelo local Ollama (gemma4:e4b).
+    Genera una respuesta utilizando RAG y el modelo local Ollama (gemma:7b).
     Propaga excepciones si falla la búsqueda de contexto.
     """
     from starlette.concurrency import run_in_threadpool
@@ -193,11 +193,11 @@ Pregunta:
 {pregunta}
 """
     
-    print("DEBUG: Enviando pregunta RAG a Ollama (gemma4:e4b)...")
+    print("DEBUG: Enviando pregunta RAG a Ollama (gemma:7b)...")
     
     try:
         # Configuración estricta del LLM como fue solicitado
-        llm = Ollama(model="gemma4:e4b", temperature=0.0)
+        llm = Ollama(model="gemma:7b", temperature=0.0)
         
         # Configurar la cadena
         prompt = PromptTemplate(

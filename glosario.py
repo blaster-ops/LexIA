@@ -50,10 +50,10 @@ class GestorGlosario:
         """
 
         try:
-            print("DEBUG: Enviando solicitud de enriquecimiento a Ollama (gemma4:e4b)...")
+            print("DEBUG: Enviando solicitud de enriquecimiento a Ollama (gemma:7b)...")
             url = "http://localhost:11434/api/generate"
             payload = {
-                "model": "gemma4:e4b",
+                "model": "gemma:7b",
                 "prompt": prompt_armado.strip(),
                 "stream": False,
                 "options": {"temperature": 0.0}

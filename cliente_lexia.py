@@ -24,7 +24,7 @@ import webview
 if __name__ == "__main__":
     webview.create_window(
         title="LexIA - Emerald Systems",
-        url="http://10.61.145.1:8000",
+        url="http://192.168.68.63:8000",
         width=1280,
         height=800
     )
