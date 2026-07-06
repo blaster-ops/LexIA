@@ -10,3 +10,4 @@ pymupdf
 sqlalchemy
 bcrypt
 pyjwt
+python-dotenv

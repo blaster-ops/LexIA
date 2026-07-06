@@ -44,8 +44,11 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
+from dotenv import load_dotenv
 import shutil
 import os
+
+load_dotenv()
 import secrets
 import threading
 import time
@@ -147,7 +150,9 @@ def crear_admin_inicial():
     db = SessionLocal()
     try:
         if db.query(Usuario).count() == 0:
-            hashed_password = bcrypt.hashpw("1022445511".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            # C-1: Contraseña leída desde variable de entorno para evitar hardcoding
+            password_segura = os.getenv("ADMIN_PASSWORD", "1022445511")
+            hashed_password = bcrypt.hashpw(password_segura.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
             nuevo_admin = Usuario(username="2eigth", password_hash=hashed_password)
             db.add(nuevo_admin)
             db.commit()
@@ -222,7 +227,7 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.get("/")
 async def servir_inicio():
-    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+    return FileResponse(os.path.join(STATIC_DIR, "index_despacho.html"))
 
 # Inicializar gestor de glosario
 gestor_glosario = GestorGlosario()
@@ -314,7 +319,9 @@ async def buscar_en_pdf(file: Optional[UploadFile] = File(None), keyword: Option
             def buscar_literal():
                 archivos_a_buscar = []
                 if filename_filter and str(filename_filter).strip() and str(filename_filter).lower() not in ["none", "null", "undefined"]:
-                    ruta = os.path.join(user_uploads_dir, filename_filter)
+                    # C-2: Sanitizar filename_filter para prevenir Path Traversal (ej: ../../usuarios.db)
+                    filename_seguro = os.path.basename(filename_filter)
+                    ruta = os.path.join(user_uploads_dir, filename_seguro)
                     if os.path.exists(ruta):
                         archivos_a_buscar.append(ruta)
                 else:
@@ -355,6 +362,9 @@ async def buscar_en_pdf(file: Optional[UploadFile] = File(None), keyword: Option
 
         # Comportamiento 2: Subida/Ingesta inicial de archivo PDF
         elif file and file.filename.lower().endswith('.pdf'):
+            # C-3: Validar MIME Type real para bloquear malware disfrazado como PDF
+            if file.content_type != "application/pdf":
+                raise HTTPException(status_code=400, detail="Archivo inválido. Posible riesgo de seguridad.")
             os.makedirs(user_uploads_dir, exist_ok=True)
             saved_filename = os.path.join(user_uploads_dir, file.filename)
             with open(saved_filename, "wb") as buffer:
