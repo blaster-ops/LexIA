@@ -3,20 +3,16 @@
 Proyecto: LexIA - Asistente Jurídico Inteligente
 Autor y Titular de Propiedad Intelectual: José Miguel Tapia Adán
 Fecha de Creación: Mayo 2026
-Institución: Universidad Tecnológica de Tehuacán (UTT)
+Sistema para Despacho Jurídico LexIA
 
 Aviso Legal:
 El presente código es una obra original. El acceso al mismo se otorga
-exclusivamente para fines de evaluación académica. Queda estrictamente
+exclusivamente para fines de evaluación académica. Queda strictly
 prohibida su copia, modificación, distribución, o apropiación por parte
 de terceros sin autorización expresa.
 
 Archivo: index_despacho.html
-Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
-             Inspirado en plataformas de investigación legal premium
-             (Westlaw, LexisNexis). Navegación horizontal, tipografía
-             serif, layout orientado a documentos.
-             Archivo de desarrollo — NO es producción.
+Descripción: Interfaz Web Principal del Despacho Jurídico LexIA.
 =============================================================================
 -->
 <!DOCTYPE html>
@@ -25,12 +21,14 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LexIA — Plataforma Jurídica</title>
+    <link rel="icon" type="image/x-icon" href="/static/LogoLexIA.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/static/LogoLexIA.ico">
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome 6 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Google Fonts: Playfair Display (serif títulos) + Inter (cuerpo) -->
+    <!-- Google Fonts: Playfair Display + Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
@@ -73,6 +71,23 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             -webkit-font-smoothing: antialiased;
         }
 
+        :where(button, input, select, textarea, [tabindex="0"]):focus-visible {
+            outline: 3px solid rgba(197,160,89,.7);
+            outline-offset: 2px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
         /* ════════════════════════════════════════════════════════════════
            PANTALLA DE LOGIN — diseño split panel
         ════════════════════════════════════════════════════════════════ */
@@ -83,7 +98,6 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             z-index: 9999;
         }
 
-        /* Panel izquierdo — identidad institucional */
         .login-panel-left {
             flex: 1.1;
             background: linear-gradient(160deg, var(--navy-dark) 0%, var(--navy) 60%, var(--navy-mid) 100%);
@@ -96,154 +110,118 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             overflow: hidden;
         }
 
-        /* Ornamento geométrico de fondo */
         .login-panel-left::before {
             content: '';
             position: absolute;
-            width: 480px; height: 480px;
-            border: 1.5px solid rgba(197,160,89,.18);
+            top: -100px; right: -100px;
+            width: 400px; height: 400px;
+            border: 1px solid rgba(197,160,89,.15);
             border-radius: 50%;
-            top: -120px; right: -160px;
+            pointer-events: none;
         }
+
         .login-panel-left::after {
             content: '';
             position: absolute;
+            bottom: -50px; left: -50px;
             width: 300px; height: 300px;
             border: 1px solid rgba(197,160,89,.1);
             border-radius: 50%;
-            bottom: -80px; left: -80px;
+            pointer-events: none;
         }
 
-        /* Línea dorada decorativa lateral */
-        .gold-bar {
-            position: absolute;
-            right: 0; top: 15%; bottom: 15%;
-            width: 3px;
-            background: linear-gradient(180deg, transparent, var(--gold) 30%, var(--gold) 70%, transparent);
-        }
-
-        .left-logo {
-            max-height: 72px;
-            width: auto;
-            margin-bottom: 2.5rem;
-            border-radius: 8px;
-            filter: drop-shadow(0 4px 12px rgba(0,0,0,.3));
-        }
-
-        .left-title {
-            font-family: var(--font-serif);
-            font-size: 3.2rem;
+        .login-brand-tag {
+            font-size: .72rem;
             font-weight: 700;
-            color: #fff;
-            line-height: 1.15;
-            margin-bottom: .8rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .left-title em {
-            font-style: italic;
-            color: var(--gold-light);
-        }
-
-        .left-subtitle {
-            color: rgba(255,255,255,.55);
-            font-size: .9rem;
-            font-weight: 400;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            margin-bottom: 2.8rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Divisor dorado */
-        .gold-divider {
-            width: 60px;
-            height: 2px;
-            background: linear-gradient(90deg, var(--gold), transparent);
-            margin-bottom: 2.2rem;
-        }
-
-        .left-bullets {
-            list-style: none;
-            position: relative;
-            z-index: 1;
-        }
-
-        .left-bullets li {
+            color: var(--gold);
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-            gap: .9rem;
+            gap: .6rem;
+        }
+
+        .login-brand-tag::before {
+            content: '';
+            display: inline-block;
+            width: 24px;
+            height: 1.5px;
+            background: var(--gold);
+        }
+
+        .login-h1 {
+            font-family: var(--font-serif);
+            font-size: 3.2rem;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.15;
+            margin-bottom: 1.2rem;
+        }
+
+        .login-h1 span {
+            color: var(--gold-light);
+            font-style: italic;
+        }
+
+        .login-subtitle {
             color: rgba(255,255,255,.65);
-            font-size: .85rem;
-            margin-bottom: .9rem;
-            font-weight: 400;
+            font-size: .95rem;
+            line-height: 1.7;
+            max-width: 440px;
+            margin-bottom: 3rem;
         }
 
-        .left-bullets li i {
+        .login-badge-list {
+            display: flex;
+            flex-direction: column;
+            gap: .8rem;
+        }
+
+        .login-badge-item {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            color: rgba(255,255,255,.8);
+            font-size: .84rem;
+        }
+
+        .login-badge-item i {
             color: var(--gold);
-            font-size: .8rem;
-            width: 16px;
-            text-align: center;
+            font-size: .85rem;
+            width: 18px;
         }
 
-        .left-footer {
-            position: absolute;
-            bottom: 2.5rem;
-            left: 5rem;
-            color: rgba(255,255,255,.25);
-            font-size: .7rem;
-            letter-spacing: .5px;
-        }
-
-        /* Panel derecho — formulario */
         .login-panel-right {
-            flex: 0 0 420px;
+            flex: 0.9;
             background: var(--white);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 3rem 3.5rem;
-            box-shadow: -8px 0 40px rgba(0,0,0,.15);
+            padding: 4rem 5rem;
         }
 
-        .form-logo-small {
-            max-height: 52px;
-            width: auto;
-            margin-bottom: 1.8rem;
-            display: none; /* solo visible en pantallas pequeñas */
+        .login-form-box {
+            width: 100%;
+            max-width: 380px;
         }
 
-        .form-heading {
+        .login-form-title {
             font-family: var(--font-serif);
             font-size: 1.75rem;
             font-weight: 600;
             color: var(--navy);
-            text-align: center;
             margin-bottom: .4rem;
         }
 
-        .form-subheading {
-            text-align: center;
-            color: var(--gray-400);
-            font-size: .8rem;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+        .login-form-sub {
+            color: var(--gray-600);
+            font-size: .86rem;
             margin-bottom: 2.2rem;
         }
 
-        /* Línea dorada debajo del encabezado */
-        .form-gold-rule {
-            width: 40px;
-            height: 2px;
-            background: var(--gold);
-            margin: 0 auto 2rem;
-        }
-
         .form-group-despacho {
-            width: 100%;
             margin-bottom: 1.3rem;
         }
 
@@ -348,151 +326,214 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
 
         .right-footer {
             margin-top: 2.5rem;
+            font-size: .75rem;
             color: var(--gray-400);
-            font-size: .68rem;
             text-align: center;
-            line-height: 1.7;
-        }
-
-        /* Responsive: pantallas pequeñas */
-        @media (max-width: 768px) {
-            .login-panel-left { display: none; }
-            .login-panel-right { flex: 1; }
-            .form-logo-small { display: block; }
         }
 
         /* ════════════════════════════════════════════════════════════════
-           PANTALLA PRINCIPAL — layout despacho
+           MODALES ELEGANTES PERSONALIZADOS (SIN ALERTAS NATIVAS CON URL)
+        ════════════════════════════════════════════════════════════════ */
+        .modal-custom-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 31, 56, 0.75);
+            backdrop-filter: blur(6px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn .2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+
+        .modal-custom-card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 450px;
+            max-height: calc(100vh - 2rem);
+            overflow-y: auto;
+            animation: slideUp .22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(16px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-custom-header {
+            background: var(--navy);
+            color: #fff;
+            padding: 1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .modal-custom-header h5 {
+            font-family: var(--font-serif);
+            font-size: 1.05rem;
+            margin: 0;
+            color: #fff;
+        }
+
+        .modal-custom-body {
+            padding: 1.5rem 1.4rem;
+            color: var(--gray-800);
+            font-size: .9rem;
+            line-height: 1.6;
+        }
+
+        .modal-custom-footer {
+            padding: .9rem 1.4rem;
+            background: var(--gray-50);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: .6rem;
+        }
+
+        /* ════════════════════════════════════════════════════════════════
+           APP PRINCIPAL — LAYOUT
         ════════════════════════════════════════════════════════════════ */
         #pantallaPrincipal {
             display: none;
-            flex-direction: column;
             height: 100vh;
-            width: 100vw;
-            overflow: hidden;
+            flex-direction: column;
         }
 
-        /* ── Barra superior institucional ─────────────────────────────── */
         .topbar-despacho {
             background: var(--navy-dark);
-            border-bottom: 3px solid var(--gold);
+            height: 56px;
             padding: 0 2rem;
             display: flex;
-            align-items: stretch;
-            height: 64px;
+            align-items: center;
+            justify-content: flex-start;
+            column-gap: 1rem;
             flex-shrink: 0;
-            box-shadow: 0 2px 12px rgba(0,0,0,.25);
+            border-bottom: 2px solid var(--gold);
         }
 
         .topbar-brand {
             display: flex;
             align-items: center;
-            gap: .9rem;
-            padding-right: 2rem;
-            border-right: 1px solid rgba(255,255,255,.1);
+            gap: .8rem;
+            color: #fff;
             text-decoration: none;
-            flex-shrink: 0;
-        }
-
-        .topbar-brand-logo {
-            max-height: 38px;
-            width: auto;
-            border-radius: 5px;
+            flex: 0 0 auto;
+            margin-right: .65rem;
         }
 
         .topbar-brand-name {
             font-family: var(--font-serif);
             font-size: 1.25rem;
-            color: #fff;
             font-weight: 600;
-            letter-spacing: .3px;
+            letter-spacing: .5px;
+            color: #fff;
         }
 
         .topbar-brand-name span { color: var(--gold); }
 
-        /* Navegación horizontal con pestañas */
-        .nav-tabs-despacho {
-            display: flex;
-            align-items: stretch;
-            list-style: none;
-            flex: 1;
-            padding: 0 1rem;
-            gap: .1rem;
+        .topbar-tag {
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--gold-light);
+            background: rgba(197,160,89,.15);
+            border: 1px solid rgba(197,160,89,.3);
+            padding: .15rem .5rem;
+            border-radius: var(--radius-sm);
         }
 
-        .nav-tabs-despacho li {
+        .nav-tabs-despacho {
             display: flex;
             align-items: center;
+            gap: .25rem;
+            height: 100%;
+            min-width: 0;
+            flex: 1 1 auto;
+            overflow: hidden;
         }
+
+        .nav-label-short { display: none; }
 
         .nav-tab-item {
             display: flex;
             align-items: center;
-            gap: .55rem;
+            gap: .5rem;
             padding: 0 1.1rem;
             height: 100%;
-            color: rgba(255,255,255,.55);
-            font-size: .8rem;
+            color: rgba(255,255,255,.65);
+            font-size: .82rem;
             font-weight: 500;
-            cursor: pointer;
+            text-decoration: none;
             border-bottom: 3px solid transparent;
-            margin-bottom: -3px; /* compensa el borde del topbar */
             transition: color var(--transition), border-color var(--transition), background var(--transition);
+            cursor: pointer;
             white-space: nowrap;
-            letter-spacing: .2px;
-            user-select: none;
-        }
-
-        .nav-tab-item i {
-            font-size: .85rem;
-            transition: color var(--transition);
         }
 
         .nav-tab-item:hover {
-            color: rgba(255,255,255,.85);
+            color: #fff;
             background: rgba(255,255,255,.05);
         }
 
         .nav-tab-item.activo {
             color: var(--gold-light);
             border-bottom-color: var(--gold);
+            background: rgba(197,160,89,.08);
+            font-weight: 600;
         }
 
-        .nav-tab-item.activo i { color: var(--gold); }
-
-        /* Ítem bloqueado */
-        .tab-bloqueado {
-            opacity: 0.35;
-            cursor: not-allowed !important;
-            pointer-events: none;
+        .nav-tab-item.tab-bloqueado {
+            opacity: .4;
+            cursor: not-allowed;
         }
 
-        /* Área de usuario en topbar */
         .topbar-user {
             display: flex;
             align-items: center;
-            gap: .8rem;
-            padding-left: 1.5rem;
-            border-left: 1px solid rgba(255,255,255,.1);
-            flex-shrink: 0;
+            gap: .55rem;
+            flex: 0 0 auto;
+            margin-left: auto;
+            min-width: 0;
+            padding-left: .7rem;
+            border-left: 1px solid rgba(255,255,255,.12);
         }
 
         .topbar-avatar {
-            width: 34px; height: 34px;
+            width: 34px;
+            height: 34px;
+            min-width: 34px;
+            min-height: 34px;
+            flex: 0 0 34px;
+            aspect-ratio: 1 / 1;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--gold), #a8832e);
+            background: var(--gold);
+            color: var(--navy-dark);
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: .88rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--navy-dark);
-            font-weight: 700;
-            font-size: .82rem;
+            line-height: 1;
+            overflow: hidden;
         }
 
         .topbar-user-info {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.3;
+            min-width: 0;
+            margin-right: .25rem;
+            line-height: 1.25;
+            white-space: nowrap;
         }
 
         .topbar-username {
@@ -509,21 +550,30 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
         .btn-logout {
             background: rgba(255,255,255,.07);
             border: 1px solid rgba(255,255,255,.12);
-            border-radius: var(--radius-sm);
-            color: rgba(255,255,255,.6);
-            padding: .35rem .7rem;
-            font-size: .78rem;
+            border-radius: 8px;
+            color: rgba(255,255,255,.78);
+            height: 34px;
+            min-height: 34px;
+            padding: 0 .7rem;
+            font-size: .76rem;
+            line-height: 1;
             cursor: pointer;
             transition: background var(--transition), color var(--transition);
-            margin-left: .4rem;
+            margin-left: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: .35rem;
+            white-space: nowrap;
         }
+
+        .btn-logout i { margin-right: 0 !important; }
 
         .btn-logout:hover {
             background: rgba(255,255,255,.13);
             color: #fff;
         }
 
-        /* ── Barra de contexto / breadcrumb ──────────────────────────── */
         .context-bar {
             background: var(--white);
             border-bottom: 1px solid var(--gray-200);
@@ -566,24 +616,22 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             flex-shrink: 0;
         }
 
-        /* ── Área de contenido principal ─────────────────────────────── */
         .content-despacho {
             flex: 1;
             overflow-y: auto;
             background: var(--cream);
         }
 
-        /* ── Secciones ───────────────────────────────────────────────── */
         .seccion-app {
             display: none;
-            animation: sectionIn .28s ease both;
+            animation: sectionIn .16s ease both;
         }
 
         .seccion-app.activa { display: block; }
 
         @keyframes sectionIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to   { opacity: 1; transform: translateY(0); }
+            from { transform: translateY(4px); }
+            to   { transform: translateY(0); }
         }
 
         .section-wrap {
@@ -592,7 +640,6 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             padding: 2.5rem 2rem;
         }
 
-        /* Encabezado de sección estilo "membrete" */
         .section-masthead {
             border-bottom: 1px solid var(--gray-200);
             padding-bottom: 1.4rem;
@@ -624,7 +671,6 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             border-radius: 2px;
         }
 
-        /* Tarjetas estilo documento */
         .doc-card {
             background: var(--white);
             border-radius: var(--radius-md);
@@ -680,7 +726,6 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             line-height: 1.8;
         }
 
-        /* Grid de métricas estilo "expediente" */
         .metrics-row {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -702,9 +747,11 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
 
         .metric-card:hover { box-shadow: var(--shadow-md); }
 
-        .metric-icon-wrap {
+        .metric-icon {
             width: 44px; height: 44px;
             border-radius: var(--radius-sm);
+            background: var(--gold-pale);
+            color: var(--navy);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -712,1015 +759,1376 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             flex-shrink: 0;
         }
 
-        .metric-icon-wrap.navy { background: rgba(26,54,93,.08); color: var(--navy); }
-        .metric-icon-wrap.gold  { background: rgba(197,160,89,.12); color: #8a6828; }
-        .metric-icon-wrap.green { background: var(--success-bg); color: var(--success); }
-
-        .metric-data .val {
-            font-size: 1.55rem;
+        .metric-val {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
             font-weight: 700;
             color: var(--navy);
-            font-family: var(--font-serif);
             line-height: 1;
+            margin-bottom: .2rem;
         }
 
-        .metric-data .lbl {
-            font-size: .73rem;
-            color: var(--gray-400);
+        .metric-lbl {
+            font-size: .74rem;
+            color: var(--gray-600);
             font-weight: 500;
-            margin-top: .2rem;
+            text-transform: uppercase;
+            letter-spacing: .5px;
         }
 
-        /* Área de consulta estilo terminal jurídica */
-        .consulta-wrap {
+        .upload-zone-despacho {
+            border: 2px dashed var(--gold);
+            border-radius: var(--radius-md);
+            background: rgba(197,160,89,.04);
+            padding: 1.8rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background var(--transition), border-color var(--transition);
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-zone-despacho:hover, .upload-zone-despacho.dragover {
+            background: rgba(197,160,89,.09);
+            border-color: var(--navy);
+        }
+
+        .upload-zone-icon {
+            font-size: 2.2rem;
+            color: var(--gold);
+            margin-bottom: .8rem;
+        }
+
+        .upload-zone-title {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            color: var(--navy);
+            font-weight: 600;
+            margin-bottom: .3rem;
+        }
+
+        .upload-zone-sub {
+            font-size: .8rem;
+            color: var(--gray-600);
+        }
+
+        .chat-layout {
             display: grid;
-            grid-template-columns: 1fr 320px;
+            grid-template-columns: 1fr 300px;
             gap: 1.5rem;
-            align-items: start;
+            height: calc(100vh - 320px);
+            min-height: 430px;
         }
 
-        @media (max-width: 900px) {
-            .consulta-wrap { grid-template-columns: 1fr; }
-        }
-
-        .transcript-area {
+        .chat-main-card {
             background: var(--white);
             border: 1px solid var(--gray-200);
             border-radius: var(--radius-md);
-            min-height: 240px;
-            padding: 1.3rem 1.5rem;
-            font-size: .87rem;
-            color: var(--gray-600);
-            line-height: 1.8;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
             box-shadow: var(--shadow-sm);
         }
 
-        .transcript-empty {
+        .chat-transcript {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 200px;
-            gap: .8rem;
+            gap: 1.2rem;
+        }
+
+        .transcript-empty {
+            margin: auto;
+            text-align: center;
+            color: var(--gray-400);
+            max-width: 320px;
         }
 
         .transcript-empty i {
-            font-size: 2.4rem;
-            color: var(--gray-200);
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: .8rem;
+
         }
 
         .transcript-empty p {
-            color: var(--gray-400);
-            font-size: .82rem;
-            text-align: center;
+            font-size: .86rem;
+            line-height: 1.6;
         }
 
-        /* Mensajes de chat */
-        .msg { margin-bottom: 1rem; }
+        .msg {
+            display: flex;
+            gap: .8rem;
+            max-width: 82%;
+        }
 
         .msg-user {
-            display: flex;
-            justify-content: flex-end;
+            margin-left: auto;
+            flex-direction: row-reverse;
         }
 
         .msg-user .bubble {
             background: var(--navy);
             color: #fff;
-            border-radius: 12px 12px 0 12px;
-            padding: .65rem 1rem;
-            max-width: 75%;
-            font-size: .85rem;
-            line-height: 1.6;
-        }
-
-        .msg-bot {
-            display: flex;
-            gap: .7rem;
-            align-items: flex-start;
-        }
-
-        .msg-bot .bot-avatar {
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--navy), var(--navy-mid));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--gold);
-            font-size: .75rem;
-            flex-shrink: 0;
-            margin-top: .1rem;
+            border-radius: 12px 12px 2px 12px;
         }
 
         .msg-bot .bubble {
             background: var(--gray-50);
             border: 1px solid var(--gray-200);
             color: var(--gray-800);
-            border-radius: 0 12px 12px 12px;
-            padding: .65rem 1rem;
-            max-width: 80%;
-            font-size: .85rem;
+            border-radius: 12px 12px 12px 2px;
+        }
+
+        .bot-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--navy-dark);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            flex-shrink: 0;
+        }
+
+        .bubble {
+            padding: .85rem 1.1rem;
+            font-size: .88rem;
             line-height: 1.7;
         }
 
-        .input-area {
+        .chat-input-bar {
+            border-top: 1px solid var(--gray-200);
+            padding: .9rem 1.2rem;
             display: flex;
-            gap: .6rem;
-            margin-top: 1rem;
+            gap: .7rem;
+            background: var(--white);
         }
 
-        .input-consulta {
+        .chat-input-bar textarea {
             flex: 1;
-            border: 1.5px solid var(--gray-200);
+            border: 1px solid var(--gray-200);
             border-radius: var(--radius-sm);
-            padding: .7rem 1rem;
+            padding: .65rem .9rem;
             font-family: var(--font-sans);
             font-size: .88rem;
+            resize: none;
+            height: 42px;
             outline: none;
-            transition: border-color var(--transition), box-shadow var(--transition);
-            color: var(--gray-800);
+            transition: border-color var(--transition);
         }
 
-        .input-consulta:focus {
-            border-color: var(--navy);
-            box-shadow: 0 0 0 3px rgba(26,54,93,.08);
-        }
+        .chat-input-bar textarea:focus { border-color: var(--navy); }
 
-        .btn-primary-despacho {
+        .btn-chat-send {
             background: var(--navy);
             color: #fff;
             border: none;
             border-radius: var(--radius-sm);
-            padding: .7rem 1.3rem;
-            font-family: var(--font-sans);
+            padding: 0 1.2rem;
             font-size: .85rem;
             font-weight: 600;
             cursor: pointer;
-            white-space: nowrap;
-            transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-            display: flex;
-            align-items: center;
-            gap: .45rem;
-        }
-
-        .btn-primary-despacho:hover {
-            background: var(--navy-dark);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(26,54,93,.25);
-        }
-
-        .btn-secondary-despacho {
-            background: var(--white);
-            color: var(--navy);
-            border: 1.5px solid var(--gray-200);
-            border-radius: var(--radius-sm);
-            padding: .65rem 1.1rem;
-            font-family: var(--font-sans);
-            font-size: .85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: border-color var(--transition), background var(--transition);
-            display: flex;
-            align-items: center;
-            gap: .4rem;
-        }
-
-        .btn-secondary-despacho:hover {
-            border-color: var(--navy);
-            background: var(--gray-50);
-        }
-
-        /* Panel lateral informativo */
-        .side-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .side-card {
-            background: var(--white);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .side-card-header {
-            background: var(--gold-pale);
-            border-bottom: 1px solid #e8d8b0;
-            padding: .7rem 1.1rem;
-            font-size: .78rem;
-            font-weight: 700;
-            color: #7a5c1e;
-            text-transform: uppercase;
-            letter-spacing: .8px;
+            transition: background var(--transition);
             display: flex;
             align-items: center;
             gap: .5rem;
         }
 
-        .side-card-body {
-            padding: 1rem 1.1rem;
-        }
+        .btn-chat-send:hover { background: var(--navy-dark); }
+        .btn-chat-send:disabled { opacity: .5; cursor: not-allowed; }
 
-        .side-card-body ul {
-            list-style: none;
-        }
-
-        .side-card-body li {
-            font-size: .82rem;
+        .btn-chat-clear {
+            background: transparent;
             color: var(--gray-600);
-            padding: .4rem 0;
-            border-bottom: 1px solid var(--gray-200);
-            cursor: pointer;
-            transition: color var(--transition);
-        }
-
-        .side-card-body li:last-child { border-bottom: none; }
-
-        .side-card-body li:hover { color: var(--navy); }
-
-        /* Tabla de glosario */
-        .table-despacho {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: .85rem;
-        }
-
-        .table-despacho thead th {
-            background: var(--navy);
-            color: #fff;
-            padding: .8rem 1.2rem;
-            font-family: var(--font-serif);
-            font-weight: 600;
-            font-size: .85rem;
-            text-align: left;
-        }
-
-        .table-despacho thead th:first-child { border-radius: var(--radius-sm) 0 0 0; }
-        .table-despacho thead th:last-child  { border-radius: 0 var(--radius-sm) 0 0; }
-
-        .table-despacho tbody td {
-            padding: .75rem 1.2rem;
-            border-bottom: 1px solid var(--gray-200);
-            color: var(--gray-800);
-        }
-
-        .table-despacho tbody tr:last-child td { border-bottom: none; }
-
-        .table-despacho tbody tr:hover { background: var(--gray-50); }
-
-        .table-despacho .term-cell {
-            font-weight: 600;
-            color: var(--navy);
-            font-family: var(--font-serif);
-        }
-
-        /* Badge de rama jurídica */
-        .rama-badge {
-            display: inline-block;
-            padding: .2rem .65rem;
-            border-radius: 30px;
-            font-size: .68rem;
-            font-weight: 600;
-            letter-spacing: .4px;
-        }
-
-        .rama-civil        { background: rgba(26,54,93,.08); color: var(--navy); }
-        .rama-constitucional { background: rgba(197,160,89,.13); color: #7a5c1e; }
-        .rama-laboral      { background: var(--success-bg); color: var(--success); }
-        .rama-penal        { background: rgba(197,60,60,.08); color: #822727; }
-
-        /* Área Lupa Legal */
-        .lupa-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        @media (max-width: 900px) {
-            .lupa-grid { grid-template-columns: 1fr; }
-        }
-
-        /* Gestión de usuarios */
-        .users-table-wrap {
-            border-radius: var(--radius-md);
-            overflow: hidden;
             border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            padding: .48rem .75rem;
+            font-size: .76rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            transition: color var(--transition), border-color var(--transition), background var(--transition);
+        }
+
+        .btn-chat-clear:hover {
+            color: var(--navy);
+            border-color: var(--navy);
+            background: rgba(26,54,93,.04);
+        }
+
+        .chat-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .sugerencia-chip {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-sm);
+            padding: .75rem 1rem;
+            font-size: .8rem;
+            color: var(--gray-800);
+            cursor: pointer;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+
+        .sugerencia-chip:hover {
+            border-color: var(--gold);
             box-shadow: var(--shadow-sm);
         }
 
-        /* Form de nuevo usuario */
-        .form-grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.2rem;
-            margin-bottom: 1.2rem;
+        .chat-input-bar {
+            position: sticky;
+            bottom: 0;
+            z-index: 2;
         }
 
-        @media (max-width: 700px) {
-            .form-grid-2 { grid-template-columns: 1fr; }
-        }
-
-        .field-label {
-            display: block;
-            font-size: .75rem;
-            font-weight: 700;
+        .chat-context-strip {
+            display: flex;
+            align-items: center;
+            gap: .55rem;
+            padding: .55rem 1rem;
+            background: var(--gold-pale);
+            border-bottom: 1px solid rgba(197,160,89,.3);
             color: var(--navy);
-            letter-spacing: .7px;
-            text-transform: uppercase;
-            margin-bottom: .4rem;
+            font-size: .76rem;
+            font-weight: 600;
         }
 
-        .field-input {
-            width: 100%;
-            border: 1.5px solid var(--gray-200);
+        .chat-context-strip i { color: #8a6519; }
+        .btn-chat-clear { white-space: nowrap; }
+        .answer-wrap { min-width: 0; }
+
+        .answer-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: .55rem;
+        }
+
+        .btn-copy-answer {
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+            color: var(--navy);
             border-radius: var(--radius-sm);
-            padding: .65rem .9rem;
-            font-family: var(--font-sans);
-            font-size: .88rem;
-            color: var(--gray-800);
-            outline: none;
-            transition: border-color var(--transition);
+            padding: .25rem .55rem;
+            font-size: .7rem;
+            cursor: pointer;
         }
 
-        .field-input:focus { border-color: var(--navy); }
+        .source-block {
+            border-top: 1px solid var(--gray-200);
+            margin-top: .75rem;
+            padding-top: .65rem;
+        }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #CBD5E0; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #A0AEC0; }
+        .source-block-title {
+            color: var(--navy);
+            font-size: .72rem;
+            font-weight: 700;
+            margin-bottom: .45rem;
+        }
+
+        .source-list { display: flex; flex-wrap: wrap; gap: .4rem; }
+
+        .source-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: 999px;
+            color: var(--gray-800);
+            padding: .25rem .55rem;
+            font-size: .7rem;
+        }
+
+        .ai-review-note {
+            display: flex;
+            align-items: flex-start;
+            gap: .55rem;
+            margin-top: 1rem;
+            padding: .7rem .85rem;
+            background: #fffaf0;
+            border: 1px solid #ecd9ad;
+            border-radius: var(--radius-sm);
+            color: #6b521c;
+            font-size: .78rem;
+            line-height: 1.5;
+        }
+
+        .field-help {
+            display: block;
+            margin-top: .35rem;
+            color: var(--gray-600);
+            font-size: .72rem;
+            line-height: 1.4;
+        }
+
+        .btn-danger-subtle {
+            margin-left: auto;
+            border: 1px solid rgba(197,48,48,.45);
+            background: rgba(197,48,48,.08);
+            color: #fff;
+            border-radius: var(--radius-sm);
+            padding: .35rem .65rem;
+            font-size: .72rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-danger-subtle:hover { background: rgba(197,48,48,.25); }
+        .table-responsive-despacho { overflow-x: auto; }
+
+        .password-meter {
+            height: 5px;
+            background: var(--gray-200);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: .45rem;
+        }
+
+        .password-meter-fill {
+            width: 0;
+            height: 100%;
+            transition: width var(--transition), background var(--transition);
+        }
+
+        @media (max-width: 1600px) {
+            .topbar-despacho { padding: 0 1rem; column-gap: .55rem; }
+            .nav-tab-item { padding: 0 .65rem; font-size: .76rem; }
+            .nav-label-gestion-full { display: none; }
+            .nav-label-gestion-short { display: inline; }
+            .topbar-userrole { display: none; }
+            .topbar-user { gap: .4rem; padding-left: .55rem; }
+            .topbar-brand { margin-right: .25rem; }
+            .btn-logout { height: 32px; min-height: 32px; padding: 0 .6rem; }
+        }
+
+        @media (max-width: 1280px) {
+            .topbar-despacho { padding: 0 1rem; }
+            .nav-tab-item { padding: 0 .65rem; font-size: .76rem; }
+            .topbar-tag { display: none; }
+            .topbar-user { gap: .35rem; }
+            .topbar-brand { margin-right: .25rem; }
+        }
+
+        @media (max-width: 1050px) {
+            .topbar-brand-name, .topbar-user-info { display: none; }
+            .nav-tabs-despacho {
+                flex: 1;
+                overflow-x: auto;
+                scrollbar-width: thin;
+                margin: 0 .6rem;
+            }
+            .context-badge { display: none; }
+        }
+
+        @media (max-width: 900px) {
+            .chat-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+                min-height: 0;
+            }
+
+            .chat-main-card { min-height: 480px; }
+            .chat-sidebar { display: grid; grid-template-columns: 1fr 1fr; }
+            .section-masthead { margin-bottom: 1.25rem; }
+        }
+
+        @media (max-width: 640px) {
+            .login-panel-left { display: none; }
+            .login-panel-right { flex: 1; padding: 2rem 1.25rem; }
+            .login-form-box { max-width: 420px; }
+            .section-wrap { padding: 1.5rem 1rem; }
+            .chat-sidebar { grid-template-columns: 1fr; }
+            .chat-input-bar { align-items: stretch; flex-direction: column; }
+            .btn-chat-send { min-height: 42px; justify-content: center; }
+            .topbar-despacho { min-height: 56px; height: auto; }
+            .topbar-avatar { display: none; }
+            .btn-logout { height: 32px; min-height: 32px; padding: 0 .5rem; }
+            .context-bar { padding: .6rem 1rem; }
+            .doc-card-header { padding: .8rem 1rem; flex-wrap: wrap; }
+            .doc-card-body { padding: 1rem; }
+        }
+
+        .tab-glosario-nav {
+            display: flex;
+            border-bottom: 2px solid var(--gray-200);
+            margin-bottom: 1.5rem;
+            gap: 1.5rem;
+        }
+
+        .tab-glosario-btn {
+            background: none;
+            border: none;
+            padding: .7rem 0;
+            font-family: var(--font-serif);
+            font-size: .95rem;
+            color: var(--gray-400);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: color var(--transition), border-color var(--transition);
+        }
+
+        .tab-glosario-btn.activo {
+            color: var(--navy);
+            border-bottom-color: var(--gold);
+            font-weight: 600;
+        }
+
+        .glosario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .table-despacho {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .86rem;
+        }
+
+        .table-despacho th {
+            font-family: var(--font-serif);
+            font-size: .8rem;
+            color: var(--navy);
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            border-bottom: 2px solid var(--gold);
+            padding: .8rem 1rem;
+            text-align: left;
+            background: var(--gray-50);
+        }
+
+        .table-despacho td {
+            padding: linear;
+            padding: .9rem 1rem;
+            border-bottom: 1px solid var(--gray-200);
+            color: var(--gray-800);
+        }
+
+        .table-despacho tr:hover td { background: var(--gray-50); }
+
+        .term-cell {
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .rama-badge {
+            display: inline-block;
+            font-size: .68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            padding: .2rem .6rem;
+            border-radius: 30px;
+        }
+
+        .rama-penal { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+        .rama-civil { background: #ebf8ff; color: #2b6cb0; border: 1px solid #bee3f8; }
+        .rama-mercantil { background: #fefcbf; color: #744210; border: 1px solid #faf089; }
+        .rama-constitucional { background: var(--gold-pale); color: #7a5c1e; border: 1px solid rgba(197,160,89,.4); }
+
+        .btn-secondary-despacho {
+            background: var(--white);
+            border: 1.5px solid var(--navy);
+            color: var(--navy);
+            border-radius: var(--radius-sm);
+            padding: .45rem 1rem;
+            font-size: .82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background var(--transition), color var(--transition);
+        }
+
+        .btn-secondary-despacho:hover {
+            background: var(--navy);
+            color: #fff;
+        }
+
+        .btn-gold-despacho {
+            background: var(--gold);
+            border: none;
+            color: var(--navy-dark);
+            border-radius: var(--radius-sm);
+            padding: .5rem 1.1rem;
+            font-size: .82rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background var(--transition);
+        }
+
+        .btn-gold-despacho:hover { background: var(--gold-light); }
+
+        /* Ocultar botones de contraseña nativos del navegador (Edge / Chrome) para evitar el doble ojito */
+        input[type="password"]::-ms-reveal,
+        input[type="password"]::-ms-clear,
+        input[type="password"]::-webkit-credentials-auto-fill-button {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
     </style>
 </head>
-
 <body>
 
-<!-- ════════════════════════════════════════════════════════════════════
-     PANTALLA LOGIN — split panel
-════════════════════════════════════════════════════════════════════ -->
+<!-- ═════════════════════════════════════════════════════════════════════
+     1. PANTALLA DE LOGIN
+══════════════════════════════════════════════════════════════════════ -->
 <div id="pantallaLogin">
-
-    <!-- Panel izquierdo: identidad -->
     <div class="login-panel-left">
-        <div class="gold-bar"></div>
-
-        <img src="LogoLexIA.png" alt="LexIA" class="left-logo"
-             onerror="this.style.display='none'">
-
-        <h1 class="left-title">Plataforma<br>Jurídica <em>Inteligente</em></h1>
-        <p class="left-subtitle">Investigación legal asistida por IA</p>
-
-        <div class="gold-divider"></div>
-
-        <ul class="left-bullets">
-            <li><i class="fa fa-check"></i> Consultas en lenguaje natural sobre legislación</li>
-            <li><i class="fa fa-check"></i> Glosario semántico con definiciones contextuales</li>
-            <li><i class="fa fa-check"></i> Análisis automático de referencias jurídicas</li>
-            <li><i class="fa fa-check"></i> Base de conocimiento basada en documentos PDF</li>
-        </ul>
-
-        <div class="left-footer">
-            © 2026 LexIA · Universidad Tecnológica de Tehuacán
+        <div class="login-brand-tag">Emerald Systems — Plataforma Jurídica</div>
+        <h1 class="login-h1">LexIA <span>Asistente Jurídico</span></h1>
+        <p class="login-subtitle">
+            Sistema de Inteligencia Artificial enfocado en la gestión, consulta e investigación didáctica del área del Derecho universal.
+        </p>
+        <div class="login-badge-list">
+            <div class="login-badge-item"><i class="fa fa-shield-halved"></i> Seguridad Enterprise con Hashing Bcrypt y JWT</div>
+            <div class="login-badge-item"><i class="fa fa-lock"></i> Autenticación de Doble Factor (MFA / 2FA) 100% Offline</div>
+            <div class="login-badge-item"><i class="fa fa-database"></i> Motor de Búsqueda Vectorial RAG con ChromaDB</div>
+            <div class="login-badge-item"><i class="fa fa-book-bookmark"></i> Diccionario Jurídico de la Firma en MySQL</div>
         </div>
     </div>
 
-    <!-- Panel derecho: formulario -->
     <div class="login-panel-right">
+        <div class="login-form-box">
+            <div class="login-error-despacho" id="dLoginError" role="alert" aria-live="assertive"></div>
 
-        <!-- Logo visible solo en móvil -->
-        <img src="LogoLexIA.png" alt="LexIA" class="form-logo-small"
-             onerror="this.style.display='none'">
+            <!-- Paso 1: Usuario y Contraseña -->
+            <form id="dFormLoginPaso1" onsubmit="iniciarSesion(event)">
+                <h2 class="login-form-title">Iniciar Sesión</h2>
+                <p class="login-form-sub">Ingresa las credenciales de tu expediente.</p>
 
-        <h2 class="form-heading">Iniciar sesión</h2>
-        <p class="form-subheading">Acceso restringido — LexIA</p>
-        <div class="form-gold-rule"></div>
+                <div class="form-group-despacho">
+                    <label class="form-label-despacho" for="dInputUsuario">Nombre de usuario</label>
+                    <input type="text" class="form-input-despacho" id="dInputUsuario" placeholder="ej. 2eigth" autocomplete="username" required>
+                </div>
 
-        <form id="formLoginDespacho" onsubmit="iniciarSesion(event)" style="width:100%;">
+                <div class="form-group-despacho">
+                    <label class="form-label-despacho" for="dInputPassword">Contraseña</label>
+                    <div class="input-password-wrap">
+                        <input type="password" class="form-input-despacho" id="dInputPassword" placeholder="••••••••" autocomplete="current-password" required>
+                        <button type="button" class="btn-ojito-despacho" onclick="toggleOjito('dInputPassword', this)" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
 
-            <div class="form-group-despacho">
-                <label for="dInputUsuario" class="form-label-despacho">
-                    <i class="fa fa-user me-1" style="opacity:.6;"></i> Usuario
-                </label>
-                <input type="text"
-                       id="dInputUsuario"
-                       class="form-input-despacho"
-                       placeholder="nombre de usuario"
-                       autocomplete="username"
-                       required>
+                <button type="submit" class="btn-login-despacho" id="dBtnIngresar">
+                    <i class="fa fa-right-to-bracket me-2"></i> Acceder al sistema
+                </button>
+            </form>
+
+            <!-- Paso 2: Doble Factor MFA (Se muestra automáticamente si el usuario tiene 2FA activo) -->
+            <form id="dFormLoginPaso2" style="display:none;" onsubmit="completarLoginMFA(event)">
+                <h2 class="login-form-title"><i class="fa fa-shield-halved text-warning me-2"></i> Verificación MFA</h2>
+                <p class="login-form-sub">Ingresa el código de 6 dígitos generado en tu aplicación Authenticator (Google / Microsoft).</p>
+
+                <div class="form-group-despacho text-center">
+                    <label class="form-label-despacho" for="dInputCodigoMFA">Código de 6 dígitos</label>
+                    <input type="text" class="form-input-despacho text-center fs-4 tracking-widest" id="dInputCodigoMFA" placeholder="000000" maxlength="6" pattern="[0-9]{6}" autocomplete="one-time-code" required style="letter-spacing: 6px;">
+                </div>
+
+                <button type="submit" class="btn-login-despacho" id="dBtnVerificarMFA">
+                    <i class="fa fa-key me-2"></i> Verificar Código
+                </button>
+                <button type="button" class="btn-secondary-despacho w-100 mt-2" onclick="cancelarLoginMFA()">
+                    <i class="fa fa-arrow-left me-1"></i> Volver a Usuario / Contraseña
+                </button>
+            </form>
+
+            <div class="right-footer">
+                LexIA v2.0 Enterprise &bull; Plataforma de Inteligencia Jurídica
             </div>
+        </div>
+    </div>
+</div>
 
-            <div class="form-group-despacho">
-                <label for="dInputPassword" class="form-label-despacho">
-                    <i class="fa fa-lock me-1" style="opacity:.6;"></i> Contraseña
-                </label>
-                <div class="input-password-wrap">
-                    <input type="password"
-                           id="dInputPassword"
-                           class="form-input-despacho"
-                           placeholder="contraseña"
-                           autocomplete="current-password"
-                           required>
-                    <button type="button"
-                            id="dBtnOjito"
-                            class="btn-ojito-despacho"
-                            onclick="togglePassword()"
-                            aria-label="Mostrar u ocultar contraseña">
-                        <i id="dIconoOjito" class="fa fa-eye"></i>
-                    </button>
+<!-- ═════════════════════════════════════════════════════════════════════
+     MODALES PERSONALIZADOS (SIN DIÁLOGOS NATIVOS DEL NAVEGADOR / SIN URL)
+══════════════════════════════════════════════════════════════════════ -->
+
+<!-- Modal de Confirmación Custom (Reemplaza confirm()) -->
+<div id="lexiaModalConfirmacion" class="modal-custom-overlay" role="dialog" aria-modal="true" aria-labelledby="lexiaConfirmTitulo" aria-describedby="lexiaConfirmMensaje">
+    <div class="modal-custom-card" tabindex="-1">
+        <div class="modal-custom-header">
+            <i class="fa fa-triangle-exclamation text-warning me-2"></i>
+            <h5 id="lexiaConfirmTitulo">Confirmación</h5>
+        </div>
+        <div class="modal-custom-body" id="lexiaConfirmMensaje">
+            ¿Está seguro de realizar esta acción?
+        </div>
+        <div class="modal-custom-footer">
+            <button type="button" class="btn-secondary-despacho" onclick="cerrarConfirmacionCustom(false)">Cancelar</button>
+            <button type="button" class="btn-gold-despacho" id="lexiaBtnConfirmarAccion">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Notificación Custom (Reemplaza alert()) -->
+<div id="lexiaModalAlerta" class="modal-custom-overlay" role="alertdialog" aria-modal="true" aria-labelledby="lexiaAlertTitulo" aria-describedby="lexiaAlertMensaje">
+    <div class="modal-custom-card" tabindex="-1">
+        <div class="modal-custom-header" id="lexiaAlertHeader">
+            <i id="lexiaAlertIcon" class="fa fa-info-circle me-2"></i>
+            <h5 id="lexiaAlertTitulo">Notificación</h5>
+        </div>
+        <div class="modal-custom-body" id="lexiaAlertMensaje">
+            Mensaje del sistema.
+        </div>
+        <div class="modal-custom-footer">
+            <button type="button" class="btn-gold-despacho" onclick="cerrarAlertaCustom()">Aceptar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Configuración MFA / Doble Factor -->
+<div id="lexiaModalSetupMFA" class="modal-custom-overlay" role="dialog" aria-modal="true" aria-labelledby="lexiaSetupMfaTitulo">
+    <div class="modal-custom-card" style="max-width: 500px;" tabindex="-1">
+        <div class="modal-custom-header">
+            <i class="fa fa-shield-halved text-warning me-2"></i>
+            <h5 id="lexiaSetupMfaTitulo">Configuración de Doble Factor (MFA)</h5>
+        </div>
+        <div class="modal-custom-body text-center">
+            <div id="mfaAvisoObligatorio" style="display:none; background: rgba(197,160,89,.15); border: 1px solid var(--gold); border-radius: var(--radius-sm); padding: .7rem 1rem; margin-bottom: 1rem; font-size: .85rem; color: var(--navy); text-align: left;">
+                <i class="fa fa-shield-halved text-warning me-1"></i>
+                <strong>ACTIVACIÓN OBLIGATORIA:</strong> Es necesario vincular tu aplicación Authenticator para poder utilizar el sistema LexIA.
+            </div>
+            <p class="small text-muted mb-3">
+                Escanea este código QR desde tu aplicación de autenticación (Google Authenticator, Microsoft Authenticator) o ingresa la clave manualmente. <strong>Funciona 100% Offline.</strong>
+            </p>
+            <div id="mfaQRContainer" class="p-3 bg-light rounded border mb-3 d-inline-block">
+                <i class="fa fa-spinner fa-spin fa-2x text-navy"></i>
+            </div>
+            <div class="mb-3 text-start">
+                <label class="form-label-despacho" for="mfaSecretKeyText">Clave Secreta Manual:</label>
+                <div class="input-group">
+                    <input type="text" id="mfaSecretKeyText" class="form-input-despacho font-monospace text-center" readonly>
+                    <button type="button" class="btn-secondary-despacho" onclick="copiarClaveMFA()"><i class="fa fa-copy"></i> Copiar</button>
                 </div>
             </div>
-
-            <!-- Error -->
-            <div id="dLoginError" class="login-error-despacho">
-                <i class="fa fa-triangle-exclamation me-1"></i>
-                Credenciales incorrectas. Verifique e intente de nuevo.
+            <div class="mb-2 text-start">
+                <label class="form-label-despacho" for="mfaConfirmCodeInput">Código de Confirmación (6 dígitos):</label>
+                <input type="text" id="mfaConfirmCodeInput" class="form-input-despacho text-center fs-5" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
             </div>
-
-            <button type="submit" id="dBtnIngresar" class="btn-login-despacho">
-                <i class="fa fa-right-to-bracket me-2"></i> Acceder al sistema
-            </button>
-        </form>
-
-        <div class="right-footer">
-            Acceso exclusivo para personal autorizado.<br>
-            Universidad Tecnológica de Tehuacán — 2026
+        </div>
+        <div class="modal-custom-footer">
+            <button type="button" class="btn-secondary-despacho" id="btnCancelarSetupMFA" onclick="cerrarModalSetupMFA()">Cancelar</button>
+            <button type="button" class="btn-gold-despacho" onclick="activarMFAConfirmado()">Activar MFA</button>
         </div>
     </div>
 </div>
 
 
-<!-- ════════════════════════════════════════════════════════════════════
-     PANTALLA PRINCIPAL — layout despacho
-════════════════════════════════════════════════════════════════════ -->
+<!-- ═════════════════════════════════════════════════════════════════════
+     2. PANTALLA PRINCIPAL DE LA APLICACIÓN
+══════════════════════════════════════════════════════════════════════ -->
 <div id="pantallaPrincipal">
 
-    <!-- ── TOPBAR INSTITUCIONAL ────────────────────────────────────── -->
+    <!-- Topbar -->
     <header class="topbar-despacho">
-
-        <!-- Marca -->
-        <a class="topbar-brand" href="#" onclick="return false;">
-            <img src="LogoLexIA.png" alt="LexIA" class="topbar-brand-logo"
-                 onerror="this.style.display='none'">
+        <a href="#" class="topbar-brand">
+            <img src="/static/LogoLexIA.ico" alt="Logo LexIA" style="height:28px; width:28px; object-fit:contain; vertical-align:middle; margin-right:.4rem; border-radius:4px;" />
             <span class="topbar-brand-name">Lex<span>IA</span></span>
+            <span class="topbar-tag">Enterprise v2.0</span>
         </a>
 
-        <!-- Pestañas de navegación horizontal -->
-        <ul class="nav-tabs-despacho" id="navTabs">
-
-            <li>
-                <div class="nav-tab-item activo"
-                     id="tabFuente"
-                     onclick="cambiarPantalla('secFuente', this)"
-                     role="button" tabindex="0">
-                    <i class="fa fa-database"></i> Fuente de conocimiento
-                </div>
-            </li>
-            <li>
-                <div class="nav-tab-item"
-                     id="tabTutor"
-                     onclick="cambiarPantalla('secTutor', this)"
-                     role="button" tabindex="0">
-                    <i class="fa fa-robot"></i> Tutor Virtual
-                </div>
-            </li>
-            <li>
-                <div class="nav-tab-item"
-                     id="tabGlosario"
-                     onclick="cambiarPantalla('secGlosario', this)"
-                     role="button" tabindex="0">
-                    <i class="fa fa-book-open"></i> Glosario
-                </div>
-            </li>
-            <li>
-                <div class="nav-tab-item"
-                     id="tabLupa"
-                     onclick="cambiarPantalla('secLupa', this)"
-                     role="button" tabindex="0">
-                    <i class="fa fa-magnifying-glass"></i> Lupa Legal
-                </div>
-            </li>
-            <li>
-                <div class="nav-tab-item tab-bloqueado"
-                     id="tabGestion"
-                     title="Requiere perfil de Administrador"
-                     aria-disabled="true">
-                    <i class="fa fa-users-gear"></i> Gestión de usuarios
-                    <i class="fa fa-lock" style="font-size:.65rem; opacity:.7; margin-left:.3rem;"></i>
-                </div>
-            </li>
-        </ul>
-
-        <!-- Usuario y logout -->
-        <div class="topbar-user">
-            <div class="topbar-avatar" id="dAvatar">U</div>
-            <div class="topbar-user-info">
-                <span class="topbar-username" id="dNombreUsuario">Usuario</span>
-                <span class="topbar-userrole" id="dRolUsuario">Estándar</span>
+        <nav class="nav-tabs-despacho" role="tablist" aria-label="Herramientas de LexIA">
+            <div class="nav-tab-item activo" id="tabFuente" role="tab" aria-selected="true" aria-controls="secFuente" data-section-label="Fuente de conocimiento" onclick="cambiarPantalla('secFuente', this)" tabindex="0">
+                <i class="fa-solid fa-folder-open"></i> Fuente de conocimiento
             </div>
-            <button class="btn-logout" id="dBtnLogout" onclick="cerrarSesion()">
-                <i class="fa fa-right-from-bracket me-1"></i> Salir
+            <div class="nav-tab-item" id="tabTutor" role="tab" aria-selected="false" aria-controls="secTutor" data-section-label="Consultor IA Legal" onclick="cambiarPantalla('secTutor', this)" tabindex="0">
+                <i class="fa-solid fa-scale-balanced"></i> Consultor IA Legal
+            </div>
+            <div class="nav-tab-item" id="tabGlosario" role="tab" aria-selected="false" aria-controls="secGlosario" data-section-label="Diccionario Jurídico" onclick="cambiarPantalla('secGlosario', this)" tabindex="0">
+                <i class="fa-solid fa-book"></i> Diccionario Jurídico
+            </div>
+            <div class="nav-tab-item" id="tabLupa" role="tab" aria-selected="false" aria-controls="secLupa" data-section-label="Lupa Legal" onclick="cambiarPantalla('secLupa', this)" tabindex="0">
+                <i class="fa-solid fa-magnifying-glass font-bold"></i> Lupa Legal
+            </div>
+            <div class="nav-tab-item tab-bloqueado" id="tabGestion" role="tab" aria-selected="false" aria-controls="secGestion" data-section-label="Gestión del Despacho" aria-disabled="true" title="Se requieren permisos de administrador">
+                <i class="fa-solid fa-users-gear"></i>
+                <span class="nav-label-gestion-full">Gestión del Despacho</span>
+                <span class="nav-label-short nav-label-gestion-short">Gestión</span>
+                <i class="fa-solid fa-lock ms-1" style="font-size:.65rem; opacity:.7;"></i>
+            </div>
+        </nav>
+
+        <div class="topbar-user">
+            <div class="topbar-avatar" id="dAvatar">A</div>
+            <div class="topbar-user-info">
+                <div class="topbar-username" id="dNombreUsuario">Cargando...</div>
+                <div class="topbar-userrole" id="dRolUsuario">Estándar</div>
+            </div>
+            <button class="btn-logout" onclick="abrirSetupMFA()" title="Configuración de Doble Factor MFA">
+                <i class="fa-solid fa-shield-halved text-warning me-1"></i> MFA
+            </button>
+            <button class="btn-logout" onclick="cerrarSesion()" title="Cerrar sesión">
+                <i class="fa-solid fa-arrow-right-from-bracket me-1"></i> Salir
             </button>
         </div>
     </header>
 
-    <!-- ── BARRA DE CONTEXTO ───────────────────────────────────────── -->
+    <!-- Context bar / breadcrumb -->
     <div class="context-bar">
         <div class="breadcrumb-despacho">
-            <i class="fa fa-house" style="color:var(--gray-400); font-size:.7rem;"></i>
-            <span class="bc-sep">/</span>
             <span>LexIA</span>
             <span class="bc-sep">/</span>
-            <span class="bc-current" id="dBreadcrumb">Fuente de conocimiento</span>
+            <span class="bc-current" id="dBreadcrumbSeccion">Fuente de conocimiento</span>
         </div>
-        <div class="context-badge">Sistema operativo</div>
+        <div class="context-badge">
+            MySQL conectado &bull; Modelo configurado: gemma:7b
+        </div>
     </div>
 
-    <!-- ── CONTENIDO ──────────────────────────────────────────────── -->
-    <div class="content-despacho" id="dMainContent">
+    <!-- Contenido principal -->
+    <main class="content-despacho">
 
-        <!-- ╔════════════════════════════════════════════╗
-             ║ SECCIÓN 1 — Fuente de conocimiento         ║
-             ╚════════════════════════════════════════════╝ -->
-        <section id="secFuente" class="seccion-app activa">
+        <!-- ─────────────────────────────────────────────────────────────
+             SECCIÓN 1: FUENTE DE CONOCIMIENTO (Subida e ingesta de PDFs)
+        ───────────────────────────────────────────────────────────── -->
+        <section id="secFuente" class="seccion-app activa" role="tabpanel" aria-labelledby="tabFuente">
             <div class="section-wrap">
-
                 <div class="section-masthead">
                     <div class="section-masthead-left">
                         <div class="section-rule"></div>
-                        <h2>Fuente de conocimiento</h2>
-                        <p>Repositorio vectorial de documentos jurídicos indexados para consulta semántica.</p>
-                    </div>
-                    <div style="display:flex; gap:.7rem;">
-                        <button class="btn-secondary-despacho" id="btnVerDocsFuente">
-                            <i class="fa fa-list"></i> Ver documentos
-                        </button>
-                        <button class="btn-primary-despacho" id="btnIngresarPDF">
-                            <i class="fa fa-cloud-arrow-up"></i> Ingresar PDF
-                        </button>
+                        <h2>Fuente de Conocimiento — Expedientes</h2>
+                        <p>Carga, administra e indexa los expedientes digitales, leyes y normativas del despacho.</p>
                     </div>
                 </div>
 
-                <!-- Métrica: solo documentos indexados (dato real del sistema) -->
-                <div class="metrics-row" style="grid-template-columns: max-content;">
+                <div class="metrics-row">
                     <div class="metric-card">
-                        <div class="metric-icon-wrap navy"><i class="fa fa-file-pdf"></i></div>
-                        <div class="metric-data">
-                            <div class="val" id="dContadorDocs">247</div>
-                            <div class="lbl">Documentos indexados</div>
+                        <div class="metric-icon"><i class="fa-solid fa-file-pdf"></i></div>
+                        <div>
+                            <div class="metric-val" id="dMetricTotalDocs">0</div>
+                            <div class="metric-lbl">PDFs Indexados</div>
+                        </div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fa-solid fa-shield"></i></div>
+                        <div>
+                            <div class="metric-val">MySQL</div>
+                            <div class="metric-lbl">Aislamiento Multitenant</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Estado del repositorio -->
+                <!-- Zona de subida de archivos -->
                 <div class="doc-card">
                     <div class="doc-card-header">
-                        <i class="fa fa-server"></i>
-                        <span class="doc-card-header-title">Estado del repositorio vectorial</span>
-                        <span class="doc-card-header-badge">ChromaDB · Activo</span>
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span class="doc-card-header-title">Carga de Expediente Digital</span>
+                        <span class="doc-card-header-badge">Soporta PDF</span>
                     </div>
                     <div class="doc-card-body">
-                        <p>
-                            La base vectorial <strong>ChromaDB</strong> se encuentra operativa. Los documentos PDF
-                            ingresados son procesados mediante embeddings y almacenados para consulta semántica de
-                            alta precisión. Última sincronización: <strong>hace 3 minutos</strong>.
-                        </p>
-                        <p style="margin-top:.8rem;">
-                            Para agregar nuevos documentos al corpus jurídico, utilice el botón
-                            <em>"Ingresar PDF"</em> en la parte superior de esta sección.
-                        </p>
+                        <details style="background: rgba(26,54,93,.04); border: 1px solid rgba(26,54,93,.15); border-radius: var(--radius-sm); padding: .75rem 1rem; margin-bottom: 1rem; font-size: .82rem; color: var(--navy); line-height: 1.5;">
+                            <summary style="cursor:pointer; font-weight:700;"><i class="fa-solid fa-circle-info me-2"></i>Requisitos para obtener mejores resultados</summary>
+                            <p style="margin:.65rem 0 0; color:var(--gray-800);">Utiliza PDF de texto digital o documentos escaneados con capa OCR. Los archivos que solo contienen fotografías sin texto seleccionable no pueden indexarse correctamente.</p>
+                        </details>
+
+                        <form id="dFormSubir" onsubmit="subirDocumento(event)">
+                            <div class="upload-zone-despacho" id="dUploadZone" role="button" tabindex="0" aria-describedby="dUploadAyuda" onclick="document.getElementById('dInputFile').click()">
+                                <div class="upload-zone-icon"><i class="fa-solid fa-file-arrow-up"></i></div>
+                                <div class="upload-zone-title">Haz clic o arrastra aquí tu expediente en PDF</div>
+                                <div class="upload-zone-sub" id="dUploadAyuda">El documento será fragmentado e indexado automáticamente para las consultas</div>
+                                <input type="file" id="dInputFile" accept=".pdf" style="display:none;" onchange="actualizarNombreArchivo(this)">
+                            </div>
+
+                            <div id="dNombreSeleccionado" style="display:none; margin-bottom:1rem; font-size:.85rem; color:var(--navy); font-weight:600;">
+                                <i class="fa-solid fa-file-pdf text-danger me-1"></i> <span id="dNombreFileTexto"></span>
+                            </div>
+
+                            <button type="submit" class="btn-secondary-despacho" id="dBtnSubirFile" disabled>
+                                <i class="fa-solid fa-bolt me-1"></i> Procesar e Ingestar Documento
+                            </button>
+                        </form>
                     </div>
                 </div>
 
-                <!-- Instrucciones -->
+                <!-- Documentos guardados -->
                 <div class="doc-card">
                     <div class="doc-card-header">
-                        <i class="fa fa-circle-info"></i>
-                        <span class="doc-card-header-title">Formato y requisitos de documentos</span>
+                        <i class="fa-solid fa-folder-tree"></i>
+                        <span class="doc-card-header-title">Repositorio de Documentos Indexados</span>
                     </div>
                     <div class="doc-card-body">
-                        <ul style="padding-left:1.2rem; color:var(--gray-600); font-size:.87rem; line-height:2.1;">
-                            <li>Formato aceptado: <strong>PDF</strong> (texto seleccionable, no escaneados sin OCR).</li>
-                            <li>Tamaño máximo por documento: <strong>50 MB</strong>.</li>
-                            <li>El tiempo de indexación varía según la longitud del documento.</li>
-                            <li>Los documentos indexados son accesibles para todos los usuarios del sistema.</li>
-                        </ul>
+                        <label class="form-label-despacho" for="dBuscarDocumento">Buscar en el repositorio</label>
+                        <input type="search" class="form-input-despacho" id="dBuscarDocumento" placeholder="Escribe parte del nombre del PDF" autocomplete="off" style="margin-bottom:1rem;">
+                        <div id="dListaDocumentos" aria-live="polite">
+                            <p style="color:var(--gray-400); font-size:.85rem;"><i class="fa-solid fa-spinner fa-spin me-2"></i> Cargando repositorio...</p>
+                        </div>
                     </div>
                 </div>
 
             </div>
         </section>
 
-
-        <!-- ╔════════════════════════════════════════════╗
-             ║ SECCIÓN 2 — Tutor Virtual                  ║
-             ╚════════════════════════════════════════════╝ -->
-        <section id="secTutor" class="seccion-app">
+        <!-- ─────────────────────────────────────────────────────────────
+             SECCIÓN 2: CONSULTOR IA LEGAL (RAG con Ollama)
+        ───────────────────────────────────────────────────────────── -->
+        <section id="secTutor" class="seccion-app" role="tabpanel" aria-labelledby="tabTutor">
             <div class="section-wrap">
-
                 <div class="section-masthead">
                     <div class="section-masthead-left">
                         <div class="section-rule"></div>
-                        <h2>Tutor Virtual</h2>
-                        <p>Consultas jurídicas en lenguaje natural basadas en la fuente de conocimiento.</p>
+                        <h2>Consultor IA Legal</h2>
+                        <p>Realiza consultas y análisis automatizados sobre los expedientes y normativas del despacho.</p>
                     </div>
                 </div>
 
-                <div class="consulta-wrap">
+                <div class="chat-layout">
+                    <div class="chat-main-card">
+                        <div class="chat-context-strip" id="dContextoTutor">
+                            <i class="fa-solid fa-file-circle-check"></i>
+                            <span>Consultando: Todos los documentos indexados</span>
+                        </div>
+                        <div class="chat-transcript" id="dChatArea" aria-live="polite" aria-label="Conversación con el Consultor IA">
+                            <div class="transcript-empty">
+                                <i class="fa-solid fa-scale-balanced"></i>
+                                <p>Ingresa una consulta sobre los expedientes o normativas cargadas para obtener análisis legal automatizado.</p>
+                            </div>
+                        </div>
 
-                    <!-- Chat principal -->
-                    <div>
+                        <div class="chat-input-bar">
+                            <label class="sr-only" for="dInputConsulta">Consulta legal</label>
+                            <textarea id="dInputConsulta" placeholder="Escribe tu consulta legal o análisis de expediente..." rows="1" aria-describedby="dAyudaConsulta"></textarea>
+                            <button class="btn-chat-send" id="dBtnEnviar">
+                                <i class="fa-solid fa-paper-plane"></i> Enviar
+                            </button>
+                            <span class="sr-only" id="dAyudaConsulta">Enter para enviar. Shift más Enter para escribir en otra línea.</span>
+                        </div>
+                    </div>
+
+                    <div class="chat-sidebar">
                         <div class="doc-card">
                             <div class="doc-card-header">
-                                <i class="fa fa-comments"></i>
-                                <span class="doc-card-header-title">Área de consulta</span>
-                                <span class="doc-card-header-badge">IA activa</span>
+                                <i class="fa-solid fa-filter"></i>
+                                <span class="doc-card-header-title">Filtro de Documento</span>
+                                <button type="button" class="btn-chat-clear ms-auto" id="dBtnLimpiarTutor"
+                                        title="Limpiar conversación y seleccionar otro documento">
+                                    <i class="fa-solid fa-eraser"></i> Limpiar chat
+                                </button>
                             </div>
                             <div class="doc-card-body">
-                                <div class="transcript-area" id="dChatArea">
-                                    <div class="transcript-empty">
-                                        <i class="fa fa-scale-balanced"></i>
-                                        <p>Bienvenido al <strong>Tutor Virtual LexIA</strong>.<br>
-                                           Formule su consulta jurídica en el campo inferior.</p>
-                                    </div>
+                                <label class="form-label-despacho" for="dArchivoTutor">Seleccionar PDF</label>
+                                <select class="form-input-despacho" id="dArchivoTutor">
+                                    <option value="">Todos los documentos</option>
+                                </select>
+                                <small class="field-help">El contexto seleccionado se muestra encima de la conversación.</small>
+                            </div>
+                        </div>
+
+                        <div class="doc-card">
+                            <div class="doc-card-header">
+                                <i class="fa-solid fa-lightbulb"></i>
+                                <span class="doc-card-header-title">Sugerencias</span>
+                            </div>
+                            <div class="doc-card-body" style="display:flex; flex-direction:column; gap:.6rem;">
+                                <div class="sugerencia-chip" onclick="usarSugerencia(this)">
+                                    ¿Cuál es el objeto y síntesis principal de los expedientes cargados?
                                 </div>
-                                <!-- Filtro por documento -->
-                                <div style="margin-top:.8rem; margin-bottom:.4rem;">
-                                    <select id="dArchivoTutor"
-                                            class="field-input"
-                                            style="font-size:.8rem; background:var(--white);">
-                                        <option value="">— Consultar en todos los documentos —</option>
-                                    </select>
+                                <div class="sugerencia-chip" onclick="usarSugerencia(this)">
+                                    Resume los argumentos jurídicos y precedentes fundamentales.
                                 </div>
-                                <div class="input-area">
-                                    <input type="text"
-                                           id="dInputConsulta"
-                                           class="input-consulta"
-                                           placeholder="Ej: ¿Cuáles son los derechos del trabajador ante un despido injustificado?">
-                                    <button class="btn-primary-despacho" id="dBtnEnviar">
-                                        <i class="fa fa-paper-plane"></i> Enviar
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─────────────────────────────────────────────────────────────
+             SECCIÓN 3: DICCIONARIO JURÍDICO (MySQL + Ollama)
+        ───────────────────────────────────────────────────────────── -->
+        <section id="secGlosario" class="seccion-app" role="tabpanel" aria-labelledby="tabGlosario">
+            <div class="section-wrap">
+                <div class="section-masthead">
+                    <div class="section-masthead-left">
+                        <div class="section-rule"></div>
+                        <h2>Diccionario Jurídico de la Firma</h2>
+                        <p>Genera y almacena definiciones técnicas, interpretación legal y fundamentos normativos para el equipo del despacho.</p>
+                    </div>
+                </div>
+
+                <div class="doc-card">
+                    <div class="doc-card-header">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span class="doc-card-header-title">Consultar y Registrar Término Legal</span>
+                    </div>
+                    <div class="doc-card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label-despacho" for="dTerminoPalabra">Término Jurídico</label>
+                                <input type="text" class="form-input-despacho" id="dTerminoPalabra" placeholder="ej. Habeas Corpus, Usucapión">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-despacho" for="dTerminoMateria">Materia Jurídica</label>
+                                <input type="text" class="form-input-despacho" id="dTerminoMateria" list="dMateriasJuridicas" placeholder="ej. Derecho Constitucional, Derecho Civil">
+                                <datalist id="dMateriasJuridicas">
+                                    <option value="Derecho Civil"></option>
+                                    <option value="Derecho Penal"></option>
+                                    <option value="Derecho Constitucional"></option>
+                                    <option value="Derecho Mercantil"></option>
+                                    <option value="Derecho Laboral"></option>
+                                    <option value="Derecho Administrativo"></option>
+                                    <option value="Derecho Familiar"></option>
+                                    <option value="Derecho Fiscal"></option>
+                                </datalist>
+                                <small class="field-help">Selecciona una materia sugerida para mantener categorías consistentes.</small>
+                            </div>
+                        </div>
+
+                        <button class="btn-secondary-despacho mt-3" id="dBtnGenerarFicha" onclick="generarFicha()">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Generar término
+                        </button>
+
+                        <div class="ai-review-note">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <span>Las fichas son generadas por IA y deben verificarse antes de utilizarse como referencia jurídica profesional.</span>
+                        </div>
+
+                        <div id="dResultadoGlosario"></div>
+                    </div>
+                </div>
+
+                <div class="doc-card" id="dCardFichasGuardadas" style="display:none;">
+                    <div class="doc-card-header">
+                        <i class="fa-solid fa-book-bookmark"></i>
+                        <span class="doc-card-header-title">Términos Registrados en el Diccionario del Despacho</span>
+                        <button class="btn-danger-subtle" onclick="borrarHistorial()" title="Eliminar permanentemente todas las fichas">
+                            <i class="fa-solid fa-trash me-1"></i> Borrar Todo
+                        </button>
+                    </div>
+                    <div class="doc-card-body">
+                        <div style="display:flex; gap:.75rem; align-items:end; margin-bottom:1.2rem;">
+                            <div style="flex:1;">
+                                <label class="form-label-despacho" for="dBuscarFicha">Buscar ficha por término</label>
+                                <input type="search" class="form-input-despacho" id="dBuscarFicha"
+                                       placeholder="Escribe parte del término, por ejemplo: ley, registro, usurpación"
+                                       autocomplete="off">
+                            </div>
+                            <button type="button" class="btn-secondary-despacho" id="dBtnLimpiarBusquedaFicha"
+                                    style="height:42px;" title="Limpiar búsqueda">
+                                <i class="fa-solid fa-rotate-left"></i> Mostrar todas
+                            </button>
+                        </div>
+                        <p id="dResumenBusquedaFichas" style="font-size:.78rem; color:var(--gray-600); margin-bottom:.8rem;"></p>
+                        <div class="glosario-grid" id="dContenedorFichas"></div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ─────────────────────────────────────────────────────────────
+             SECCIÓN 4: LUPA LEGAL (Búsqueda Léxica Exacta)
+        ───────────────────────────────────────────────────────────── -->
+        <section id="secLupa" class="seccion-app" role="tabpanel" aria-labelledby="tabLupa">
+            <div class="section-wrap">
+                <div class="section-masthead">
+                    <div class="section-masthead-left">
+                        <div class="section-rule"></div>
+                        <h2>Lupa Legal — Búsqueda Exacta en Expedientes</h2>
+                        <p>Localización inmediata de cláusulas, artículos y términos exactos en los expedientes del despacho.</p>
+                    </div>
+                </div>
+
+                <div class="doc-card">
+                    <div class="doc-card-header">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <span class="doc-card-header-title">Búsqueda Exacta en Documentos</span>
+                    </div>
+                    <div class="doc-card-body">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label-despacho" for="dKeywordLupa">Palabra o Frase Clave</label>
+                                <input type="text" class="form-input-despacho" id="dKeywordLupa" placeholder="ej. indemnización, plazo perentorio">
+                                <small class="field-help">Busca coincidencias literales; escribe la frase tal como aparece en el documento.</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-despacho" for="dArchivoLupa">Filtrar por Archivo (Opcional)</label>
+                                <select class="form-input-despacho" id="dArchivoLupa">
+                                    <option value="">Todos los archivos</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button class="btn-secondary-despacho mt-3" id="dBtnAnalizar" onclick="buscarFragmento()">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> Buscar
+                        </button>
+                        <button class="btn-secondary-despacho mt-3 ms-2" type="button" id="dBtnLimpiarLupa">
+                            <i class="fa-solid fa-rotate-left me-1"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="doc-card">
+                    <div class="doc-card-header">
+                        <i class="fa-solid fa-align-left"></i>
+                        <span class="doc-card-header-title">Resultados de la Búsqueda</span>
+                    </div>
+                    <div class="doc-card-body" id="dResultadoLupa" aria-live="polite">
+                        <div class="transcript-empty">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <p>Ingresa un término para buscar coincidencias literales en tus PDFs.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ─────────────────────────────────────────────────────────────
+             SECCIÓN 5: GESTIÓN DE USUARIOS (Administración)
+        ───────────────────────────────────────────────────────────── -->
+        <section id="secGestion" class="seccion-app" role="tabpanel" aria-labelledby="tabGestion">
+            <div class="section-wrap">
+                <div class="section-masthead">
+                    <div class="section-masthead-left">
+                        <div class="section-rule"></div>
+                        <h2>Gestión del Despacho — Usuarios</h2>
+                        <p>Administra cuentas y permisos del sistema LexIA en MySQL.</p>
+                    </div>
+                </div>
+
+                <div class="doc-card">
+                    <div class="doc-card-header">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span class="doc-card-header-title">Registrar Nuevo Usuario</span>
+                    </div>
+                    <div class="doc-card-body">
+                        <div id="dAdminAlert" role="alert" aria-live="assertive" style="display:none; margin-bottom:1rem; padding:.6rem 1rem; border-radius:var(--radius-sm);"></div>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label-despacho" for="dNuevoNombre">Nombre de Usuario</label>
+                                <input type="text" class="form-input-despacho" id="dNuevoNombre" placeholder="ej. abogado_perez" autocomplete="off">
+                                <small style="font-size: .72rem; color: var(--gray-600); margin-top: 4px; display: block;">Solo letras, números y guiones bajos (sin espacios ni símbolos).</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-despacho" for="dNuevoPass">Contraseña Inicial</label>
+                                <div class="input-password-wrap">
+                                    <input type="password" class="form-input-despacho" id="dNuevoPass" placeholder="••••••••">
+                                    <button type="button" class="btn-ojito-despacho" onclick="toggleOjito('dNuevoPass', this)" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="password-meter" aria-hidden="true"><div class="password-meter-fill" id="dPasswordMeter"></div></div>
+                                <small class="field-help" id="dPasswordHelp">Mínimo 6 caracteres. Se recomienda combinar letras, números y símbolos.</small>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label-despacho" for="dNuevoPassConfirm">Confirmar Contraseña Inicial</label>
+                                <div class="input-password-wrap">
+                                    <input type="password" class="form-input-despacho" id="dNuevoPassConfirm" placeholder="••••••••">
+                                    <button type="button" class="btn-ojito-despacho" onclick="toggleOjito('dNuevoPassConfirm', this)" aria-label="Mostrar contraseña" title="Mostrar contraseña">
+                                        <i class="fa fa-eye"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Panel lateral de sugerencias -->
-                    <div class="side-panel">
-                        <div class="side-card">
-                            <div class="side-card-header">
-                                <i class="fa fa-lightbulb"></i> Consultas frecuentes
-                            </div>
-                            <div class="side-card-body">
-                                <ul>
-                                    <li onclick="usarSugerencia(this)">¿Qué es el habeas corpus?</li>
-                                    <li onclick="usarSugerencia(this)">Proceso para demanda laboral en México</li>
-                                    <li onclick="usarSugerencia(this)">Artículo 123 de la Constitución</li>
-                                    <li onclick="usarSugerencia(this)">Diferencia entre sobreseimiento y absolución</li>
-                                    <li onclick="usarSugerencia(this)">¿Qué es la usucapión?</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="side-card">
-                            <div class="side-card-header">
-                                <i class="fa fa-circle-info"></i> Aviso
-                            </div>
-                            <div class="side-card-body">
-                                <p style="font-size:.8rem; color:var(--gray-600); line-height:1.7;">
-                                    Las respuestas se generan a partir de los documentos
-                                    indexados. No sustituyen asesoría jurídica profesional.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ╔════════════════════════════════════════════╗
-             ║ SECCIÓN 3 — Glosario Inteligente           ║
-             ╚════════════════════════════════════════════╝ -->
-        <section id="secGlosario" class="seccion-app">
-            <div class="section-wrap">
-
-                <div class="section-masthead">
-                    <div class="section-masthead-left">
-                        <div class="section-rule"></div>
-                        <h2>Glosario Inteligente</h2>
-                        <p>Genera fichas jurídicas con IA a partir de un término y su materia. Las fichas se guardan en su historial personal.</p>
-                    </div>
-                    <button class="btn-secondary-despacho" id="dBtnVerFichas" onclick="cargarFichasGuardadas()">
-                        <i class="fa fa-folder-open"></i> Ver mis fichas
-                    </button>
-                </div>
-
-                <!-- Formulario generador de ficha -->
-                <div class="doc-card">
-                    <div class="doc-card-header">
-                        <i class="fa fa-wand-magic-sparkles"></i>
-                        <span class="doc-card-header-title">Generar nueva ficha jurídica</span>
-                        <span class="doc-card-header-badge">IA · Ollama</span>
-                    </div>
-                    <div class="doc-card-body">
-                        <div class="form-grid-2" style="margin-bottom:1rem;">
-                            <div>
-                                <label class="field-label" for="dTerminoPalabra">Término jurídico</label>
-                                <input type="text" id="dTerminoPalabra" class="field-input"
-                                       placeholder="ej. Usucapión, Amparo, Tutela...">
-                            </div>
-                            <div>
-                                <label class="field-label" for="dTerminoMateria">Materia</label>
-                                <input type="text" id="dTerminoMateria" class="field-input"
-                                       placeholder="ej. Derecho Civil, Derecho Laboral...">
-                            </div>
-                        </div>
-                        <div style="display:flex; gap:.7rem; align-items:center; flex-wrap:wrap;">
-                            <button class="btn-primary-despacho" id="dBtnGenerarFicha" onclick="generarFicha()">
-                                <i class="fa fa-wand-magic-sparkles"></i> Generar ficha
-                            </button>
-                            <button class="btn-secondary-despacho" id="dBtnBorrarHistorial" onclick="borrarHistorial()">
-                                <i class="fa fa-trash"></i> Borrar historial
-                            </button>
-                        </div>
-                        <!-- Resultado de la ficha generada -->
-                        <div id="dResultadoGlosario" style="margin-top:1.2rem;"></div>
-                    </div>
-                </div>
-
-                <!-- Fichas guardadas -->
-                <div class="doc-card" id="dCardFichasGuardadas" style="display:none;">
-                    <div class="doc-card-header">
-                        <i class="fa fa-folder-open"></i>
-                        <span class="doc-card-header-title">Mis fichas guardadas</span>
-                    </div>
-                    <div class="doc-card-body">
-                        <div id="dContenedorFichas"
-                             style="display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:1rem;">
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-
-        <!-- ╔════════════════════════════════════════════╗
-             ║ SECCIÓN 4 — Lupa Legal                     ║
-             ╚════════════════════════════════════════════╝ -->
-        <section id="secLupa" class="seccion-app">
-            <div class="section-wrap">
-
-                <div class="section-masthead">
-                    <div class="section-masthead-left">
-                        <div class="section-rule"></div>
-                        <h2>Lupa Legal</h2>
-                        <p>Búsqueda literal de palabras clave o frases exactas dentro de los documentos PDF indexados.</p>
-                    </div>
-                </div>
-
-                <div class="lupa-grid">
-
-                    <!-- Input de búsqueda -->
-                    <div class="doc-card">
-                        <div class="doc-card-header">
-                            <i class="fa fa-magnifying-glass"></i>
-                            <span class="doc-card-header-title">Búsqueda literal en documentos</span>
-                        </div>
-                        <div class="doc-card-body">
-                            <div style="margin-bottom:1rem;">
-                                <label class="field-label" for="dKeywordLupa">Palabra clave o frase exacta</label>
-                                <input type="text"
-                                       id="dKeywordLupa"
-                                       class="field-input"
-                                       placeholder="ej. artículo 123, habeas corpus, rescisión de contrato...">
-                            </div>
-                            <div style="margin-bottom:1.2rem;">
-                                <label class="field-label" for="dArchivoLupa">Filtrar por documento (opcional)</label>
-                                <select id="dArchivoLupa"
-                                        class="field-input"
-                                        style="background:var(--white);">
-                                    <option value="">— Buscar en todos los documentos —</option>
-                                </select>
-                            </div>
-                            <div style="display:flex; justify-content:flex-end;">
-                                <button class="btn-primary-despacho" id="dBtnAnalizar">
-                                    <i class="fa fa-magnifying-glass"></i> Buscar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Resultados -->
-                    <div class="doc-card">
-                        <div class="doc-card-header">
-                            <i class="fa fa-file-contract"></i>
-                            <span class="doc-card-header-title">Fragmento encontrado</span>
-                        </div>
-                        <div class="doc-card-body">
-                            <div class="transcript-area" id="dResultadoLupa" style="min-height:220px;">
-                                <div class="transcript-empty">
-                                    <i class="fa fa-magnifying-glass"></i>
-                                    <p>El fragmento del documento<br>aparecerá aquí al buscar.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </section>
-
-
-        <!-- ╔════════════════════════════════════════════╗
-             ║ SECCIÓN 5 — Alta y baja de usuarios        ║
-             ║ (solo admin)                               ║
-             ╚════════════════════════════════════════════╝ -->
-        <section id="secGestion" class="seccion-app">
-            <div class="section-wrap">
-
-                <div class="section-masthead">
-                    <div class="section-masthead-left">
-                        <div class="section-rule"></div>
-                        <h2>Gestión de usuarios</h2>
-                        <p>Alta, consulta y baja de cuentas de acceso. Exclusivo para administradores.</p>
-                    </div>
-                    <span style="font-size:.75rem; font-weight:700; color:#7a5c1e;
-                                 background:var(--gold-pale); border:1px solid #e8d8b0;
-                                 border-radius:30px; padding:.3rem .9rem;">
-                        <i class="fa fa-shield-halved me-1"></i> Acceso Administrador
-                    </span>
-                </div>
-
-                <!-- Formulario de nuevo usuario -->
-                <div class="doc-card">
-                    <div class="doc-card-header">
-                        <i class="fa fa-user-plus"></i>
-                        <span class="doc-card-header-title">Registrar nuevo usuario</span>
-                    </div>
-                    <div class="doc-card-body">
-                        <div class="form-grid-2">
-                            <div>
-                                <label class="field-label" for="dNuevoNombre">Nombre de usuario</label>
-                                <input type="text" id="dNuevoNombre" class="field-input" placeholder="ej. jose.tapia">
-                            </div>
-                            <div>
-                                <label class="field-label" for="dNuevoPass">Contraseña</label>
-                                <input type="password" id="dNuevoPass" class="field-input" placeholder="••••••••">
-                            </div>
-                        </div>
-                        <button class="btn-primary-despacho" id="dBtnRegistrar" style="width:auto;">
-                            <i class="fa fa-user-plus"></i> Registrar usuario
+                        <button class="btn-secondary-despacho mt-3" id="dBtnRegistrar" onclick="crearUsuarioAdmin()">
+                            <i class="fa-solid fa-user-plus me-1"></i> Registrar usuario
                         </button>
+                        <small class="field-help">Las cuentas nuevas se registran con rol Estándar y deberán configurar MFA en su primer acceso.</small>
                     </div>
                 </div>
 
-                <!-- Tabla de usuarios existentes (dinámica) -->
                 <div class="doc-card">
                     <div class="doc-card-header">
-                        <i class="fa fa-users"></i>
-                        <span class="doc-card-header-title">Usuarios del sistema</span>
+                        <i class="fa-solid fa-users"></i>
+                        <span class="doc-card-header-title">Usuarios Registrados</span>
                     </div>
-                    <div class="doc-card-body" style="padding:0;">
-                        <div class="users-table-wrap">
-                            <table class="table-despacho">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Usuario</th>
-                                        <th>Rol</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="dTablaUsuarios">
-                                    <tr>
-                                        <td colspan="4" style="text-align:center; color:var(--gray-400);
-                                                               padding:2rem; font-size:.85rem;">
-                                            <i class="fa fa-spinner fa-spin me-2"></i> Cargando usuarios...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <!-- Feedback alta de usuario -->
-                        <div id="dAdminAlert" style="padding:.8rem 1.5rem; display:none;"></div>
+                    <div class="doc-card-body p-0 table-responsive-despacho">
+                        <table class="table-despacho">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Usuario</th>
+                                    <th>Rol</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dTablaUsuarios"></tbody>
+                        </table>
                     </div>
                 </div>
 
             </div>
         </section>
 
-    </div><!-- /content-despacho -->
-</div><!-- /pantallaPrincipal -->
+    </main>
+</div>
 
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+<!-- ═════════════════════════════════════════════════════════════════════
+     SCRIPTS Y LÓGICA JAVASCRIPT
+══════════════════════════════════════════════════════════════════════ -->
 <script>
-    /* ═══════════════════════════════════════════════════════════════
-       CONSTANTE ADMIN — nombre real del administrador en la DB
-    ═══════════════════════════════════════════════════════════════ */
-    const ADMIN_USERNAME = '2eigth';
+    let currentUserData = null;
+    let mfaPreauthToken = null;
+    let onConfirmCallback = null;
+    let glossarySearchTimer = null;
+    let uiSessionGeneration = 0;
+    let ultimoFocoAntesDeModal = null;
 
+    const CHAT_EMPTY_HTML = `
+        <div class="transcript-empty">
+            <i class="fa-solid fa-scale-balanced"></i>
+            <p>Ingresa una consulta sobre los expedientes o normativas cargadas para obtener análisis legal automatizado.</p>
+        </div>`;
 
-    /* ═══════════════════════════════════════════════════════════════
-       togglePassword()
-       Alterna visibilidad del campo contraseña en el login.
-    ═══════════════════════════════════════════════════════════════ */
-    function togglePassword() {
-        const campo = document.getElementById('dInputPassword');
-        const icono = document.getElementById('dIconoOjito');
-        if (campo.type === 'password') {
-            campo.type = 'text';
-            icono.classList.replace('fa-eye', 'fa-eye-slash');
-        } else {
-            campo.type = 'password';
-            icono.classList.replace('fa-eye-slash', 'fa-eye');
+    const LUPA_EMPTY_HTML = `
+        <div class="transcript-empty">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <p>Ingresa un término para buscar coincidencias literales en tus PDFs.</p>
+        </div>`;
+
+    function limpiarInterfazSesion() {
+        // Invalida respuestas asíncronas iniciadas por la sesión anterior.
+        uiSessionGeneration += 1;
+        if (glossarySearchTimer) {
+            clearTimeout(glossarySearchTimer);
+            glossarySearchTimer = null;
         }
-        campo.focus();
+
+        const asignarValor = (id, valor = '') => {
+            const elemento = document.getElementById(id);
+            if (elemento) elemento.value = valor;
+        };
+        const asignarHTML = (id, contenido = '') => {
+            const elemento = document.getElementById(id);
+            if (elemento) elemento.innerHTML = contenido;
+        };
+
+        asignarHTML('dChatArea', CHAT_EMPTY_HTML);
+        asignarValor('dInputConsulta');
+        asignarValor('dArchivoTutor');
+        actualizarContextoTutor();
+
+        asignarValor('dTerminoPalabra');
+        asignarValor('dTerminoMateria');
+        asignarValor('dBuscarFicha');
+        asignarHTML('dResultadoGlosario');
+        asignarHTML('dResumenBusquedaFichas');
+        asignarHTML('dContenedorFichas');
+        const cardFichas = document.getElementById('dCardFichasGuardadas');
+        if (cardFichas) cardFichas.style.display = 'none';
+
+        asignarValor('dKeywordLupa');
+        asignarValor('dArchivoLupa');
+        asignarHTML('dResultadoLupa', LUPA_EMPTY_HTML);
+
+        asignarValor('dInputFile');
+        asignarValor('dBuscarDocumento');
+        asignarHTML('dNombreFileTexto');
+        const nombreSeleccionado = document.getElementById('dNombreSeleccionado');
+        if (nombreSeleccionado) nombreSeleccionado.style.display = 'none';
+        const botonSubir = document.getElementById('dBtnSubirFile');
+        if (botonSubir) botonSubir.disabled = true;
+        document.getElementById('dUploadFeedback')?.remove();
+
+        ['dNuevoNombre', 'dNuevoPass', 'dNuevoPassConfirm'].forEach(id => asignarValor(id));
+        actualizarFortalezaPassword('');
+        asignarHTML('dTablaUsuarios');
+        const adminAlert = document.getElementById('dAdminAlert');
+        if (adminAlert) {
+            adminAlert.innerHTML = '';
+            adminAlert.style.display = 'none';
+        }
+
+        const botonTutor = document.getElementById('dBtnEnviar');
+        if (botonTutor) {
+            botonTutor.disabled = false;
+            botonTutor.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar';
+        }
     }
 
+    function limpiarTutor() {
+        // Evita que una respuesta que ya estaba procesándose vuelva a llenar el chat.
+        uiSessionGeneration += 1;
+        const chatArea = document.getElementById('dChatArea');
+        const input = document.getElementById('dInputConsulta');
+        const filtro = document.getElementById('dArchivoTutor');
+        const boton = document.getElementById('dBtnEnviar');
 
-    /* ═══════════════════════════════════════════════════════════════
-       getAuthHeaders(extraHeaders)
-       Construye las cabeceras de autenticación Bearer para fetch().
-    ═══════════════════════════════════════════════════════════════ */
-    function getAuthHeaders(extraHeaders = {}) {
+        if (chatArea) chatArea.innerHTML = CHAT_EMPTY_HTML;
+        if (input) input.value = '';
+        if (filtro) filtro.value = '';
+        actualizarContextoTutor();
+        if (boton) {
+            boton.disabled = false;
+            boton.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar';
+        }
+        input?.focus();
+    }
+
+    function actualizarContextoTutor() {
+        const filtro = document.getElementById('dArchivoTutor');
+        const contexto = document.querySelector('#dContextoTutor span');
+        if (!contexto) return;
+        contexto.textContent = filtro?.value
+            ? `Consultando únicamente: ${filtro.value}`
+            : 'Consultando: Todos los documentos indexados';
+    }
+
+    /* ─── Encabezados de Autenticación ─── */
+    function getAuthHeaders(extras = {}) {
         const token = localStorage.getItem('access_token');
         return {
             'Authorization': 'Bearer ' + token,
-            ...extraHeaders
+            ...extras
         };
     }
 
+    /* Todo dato proveniente del servidor, PDFs o usuarios se trata como texto. */
+    function escapeHTML(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
 
-    /* ═══════════════════════════════════════════════════════════════
-       checkAuthError(response)
-       Si la respuesta es 401 cierra la sesión automáticamente.
-    ═══════════════════════════════════════════════════════════════ */
+    function safeInlineFormat(value) {
+        return escapeHTML(value)
+            .replace(/\*{1,2}(.*?)\*{1,2}/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+    }
+
     function checkAuthError(response) {
         if (response.status === 401) {
-            cerrarSesion();
-            throw new Error('Sesión expirada. Por favor, inicia sesión de nuevo.');
+            localStorage.removeItem('access_token');
+            mostrarLogin();
+            throw new Error('Sesión expirada.');
         }
-        return response;
     }
 
+    /* ─── MODALES PERSONALIZADOS (SIN ALERTA NATIVA CON URL) ─── */
+    function mostrarConfirmacionCustom(titulo, mensaje, callback) {
+        document.getElementById('lexiaConfirmTitulo').textContent = titulo || 'Confirmación';
+        document.getElementById('lexiaConfirmMensaje').textContent = mensaje || '¿Confirmar acción?';
+        onConfirmCallback = callback;
+        ultimoFocoAntesDeModal = document.activeElement;
+        const modal = document.getElementById('lexiaModalConfirmacion');
+        modal.style.display = 'flex';
+        modal.querySelector('.modal-custom-card')?.focus();
+    }
 
-    /* ═══════════════════════════════════════════════════════════════
-       cambiarPantalla(idSeccion, elementoTab)
-       Oculta todas las secciones y muestra la solicitada.
-       Actualiza la pestaña activa y el breadcrumb.
-    ═══════════════════════════════════════════════════════════════ */
+    function cerrarConfirmacionCustom(confirmado) {
+        document.getElementById('lexiaModalConfirmacion').style.display = 'none';
+        if (confirmado && typeof onConfirmCallback === 'function') {
+            onConfirmCallback();
+        }
+        onConfirmCallback = null;
+        ultimoFocoAntesDeModal?.focus?.();
+    }
+
+    document.getElementById('lexiaBtnConfirmarAccion').addEventListener('click', () => {
+        cerrarConfirmacionCustom(true);
+    });
+
+    function mostrarAlertaCustom(titulo, mensaje, tipo = 'info') {
+        const header = document.getElementById('lexiaAlertHeader');
+        const icon = document.getElementById('lexiaAlertIcon');
+        document.getElementById('lexiaAlertTitulo').textContent = titulo || 'Notificación';
+        document.getElementById('lexiaAlertMensaje').textContent = mensaje || '';
+
+        if (tipo === 'error') {
+            header.style.background = '#8c1d1d';
+            icon.className = 'fa fa-triangle-exclamation me-2';
+        } else if (tipo === 'success') {
+            header.style.background = '#276749';
+            icon.className = 'fa fa-circle-check me-2';
+        } else {
+            header.style.background = 'var(--navy)';
+            icon.className = 'fa fa-info-circle me-2';
+        }
+        ultimoFocoAntesDeModal = document.activeElement;
+        const modal = document.getElementById('lexiaModalAlerta');
+        modal.style.display = 'flex';
+        modal.querySelector('.modal-custom-card')?.focus();
+    }
+
+    function cerrarAlertaCustom() {
+        document.getElementById('lexiaModalAlerta').style.display = 'none';
+        ultimoFocoAntesDeModal?.focus?.();
+    }
+
+    /* ─── NAVEGACIÓN Y CAMBIO DE PANTALLAS ─── */
     function cambiarPantalla(idSeccion, elementoTab) {
         document.querySelectorAll('.seccion-app').forEach(s => s.classList.remove('activa'));
-        const destino = document.getElementById(idSeccion);
-        if (destino) destino.classList.add('activa');
-        document.querySelectorAll('.nav-tab-item').forEach(t => t.classList.remove('activo'));
-        if (elementoTab) elementoTab.classList.add('activo');
-        const bc = document.getElementById('dBreadcrumb');
-        if (bc && elementoTab) {
-            bc.textContent = elementoTab.textContent.trim().replace(/\s+/g, ' ');
+        document.querySelectorAll('.nav-tab-item').forEach(t => {
+            t.classList.remove('activo');
+            t.setAttribute('aria-selected', 'false');
+        });
+
+        document.getElementById(idSeccion).classList.add('activa');
+        if (elementoTab) {
+            elementoTab.classList.add('activo');
+            elementoTab.setAttribute('aria-selected', 'true');
         }
-        // Cargar lista de archivos al entrar a Lupa o Tutor
-        if (idSeccion === 'secLupa' || idSeccion === 'secTutor') {
-            cargarArchivos();
-        }
-        // Cargar usuarios al entrar a gestión
-        if (idSeccion === 'secGestion') {
-            cargarUsuariosAdmin();
+        const contenido = document.querySelector('.content-despacho');
+        if (contenido) contenido.scrollTop = 0;
+
+        const textoBreadcrumb = elementoTab?.dataset.sectionLabel || elementoTab?.innerText.trim() || 'Sección';
+        document.getElementById('dBreadcrumbSeccion').textContent = textoBreadcrumb;
+
+        if (['secFuente', 'secTutor', 'secLupa'].includes(idSeccion)) cargarArchivos();
+        if (idSeccion === 'secGlosario') cargarFichasGuardadas();
+        if (idSeccion === 'secGestion') cargarUsuariosAdmin();
+    }
+
+    function toggleOjito(idInput, btn) {
+        const input = document.getElementById(idInput);
+        const icono = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icono.className = 'fa fa-eye-slash';
+            btn.setAttribute('aria-label', 'Ocultar contraseña');
+            btn.title = 'Ocultar contraseña';
+        } else {
+            input.type = 'password';
+            icono.className = 'fa fa-eye';
+            btn.setAttribute('aria-label', 'Mostrar contraseña');
+            btn.title = 'Mostrar contraseña';
         }
     }
 
-
-    /* ═══════════════════════════════════════════════════════════════
-       verificarAuth()
-       Al cargar la página comprueba si hay un token válido en
-       localStorage. Si lo hay va directo a la app, si no al login.
-    ═══════════════════════════════════════════════════════════════ */
+    /* ─── AUTENTICACIÓN Y MFA ─── */
     async function verificarAuth() {
         const token = localStorage.getItem('access_token');
         if (!token) {
             mostrarLogin();
             return;
         }
-        // Validar token con una petición ligera al backend
         try {
-            const res = await fetch('/listar_archivos/', {
-                headers: getAuthHeaders()
-            });
-            if (res.status === 401) {
+            const resMe = await fetch('/me', { headers: getAuthHeaders() });
+            if (!resMe.ok) {
                 localStorage.removeItem('access_token');
                 mostrarLogin();
-            } else {
-                // Token válido: obtener nombre de usuario del payload JWT
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                const username = payload.sub || 'Usuario';
-                actualizarUIUsuario(username);
-                mostrarApp();
-                // Actualizar contador de documentos
+                return;
+            }
+            currentUserData = await resMe.json();
+            limpiarInterfazSesion();
+            actualizarUIUsuario(currentUserData);
+            mostrarApp();
+
+            // Si el usuario no tiene MFA habilitado, OBLIGAR a activarlo inmediatamente
+            if (!currentUserData.mfa_enabled) {
+                abrirSetupMFA(true);
+            }
+
+            const res = await fetch('/listar_archivos/', { headers: getAuthHeaders() });
+            if (res.ok) {
                 const data = await res.json();
                 actualizarContadorDocs(data.archivos || []);
             }
@@ -1729,39 +2137,37 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
         }
     }
 
+    function actualizarUIUsuario(userObj) {
+        const username = typeof userObj === 'string' ? userObj : (userObj.username || 'Usuario');
+        const isAdmin = typeof userObj === 'object' && userObj !== null ? Boolean(userObj.is_admin) : false;
 
-    /* ═══════════════════════════════════════════════════════════════
-       actualizarUIUsuario(username)
-       Escribe el nombre de usuario en la topbar y desbloquea
-       la pestaña de admin si corresponde.
-    ═══════════════════════════════════════════════════════════════ */
-    function actualizarUIUsuario(username) {
         document.getElementById('dNombreUsuario').textContent = username;
-        document.getElementById('dRolUsuario').textContent    =
-            username === ADMIN_USERNAME ? 'Administrador' : 'Estándar';
+        document.getElementById('dRolUsuario').textContent = isAdmin ? 'Administrador' : 'Estándar';
         document.getElementById('dAvatar').textContent = username.charAt(0).toUpperCase();
 
         const tabGestion = document.getElementById('tabGestion');
-        if (username === ADMIN_USERNAME) {
+        if (isAdmin) {
             tabGestion.classList.remove('tab-bloqueado');
             tabGestion.setAttribute('onclick', "cambiarPantalla('secGestion', this)");
             tabGestion.setAttribute('tabindex', '0');
+            tabGestion.setAttribute('aria-disabled', 'false');
+            tabGestion.title = 'Administrar usuarios del despacho';
             const candado = tabGestion.querySelector('.fa-lock');
             if (candado) candado.remove();
         } else {
             tabGestion.classList.add('tab-bloqueado');
             tabGestion.removeAttribute('onclick');
+            tabGestion.removeAttribute('tabindex');
             tabGestion.setAttribute('aria-disabled', 'true');
+            tabGestion.title = 'Se requieren permisos de administrador';
         }
     }
 
-
-    /* ═══════════════════════════════════════════════════════════════
-       mostrarLogin() / mostrarApp()
-    ═══════════════════════════════════════════════════════════════ */
     function mostrarLogin() {
+        limpiarInterfazSesion();
         document.getElementById('pantallaLogin').style.display     = 'flex';
         document.getElementById('pantallaPrincipal').style.display = 'none';
+        cancelarLoginMFA();
     }
 
     function mostrarApp() {
@@ -1770,12 +2176,6 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
         cargarArchivos();
     }
 
-
-    /* ═══════════════════════════════════════════════════════════════
-       iniciarSesion(event)
-       Autenticación real contra POST /login (OAuth2 form-data).
-       Guarda el JWT en localStorage.
-    ═══════════════════════════════════════════════════════════════ */
     async function iniciarSesion(event) {
         event.preventDefault();
 
@@ -1813,12 +2213,14 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
                 else if (data.detail) msg = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
                 errorDiv.textContent   = msg;
                 errorDiv.style.display = 'block';
-                document.getElementById('dInputPassword').value = '';
-                document.getElementById('dInputPassword').focus();
+            } else if (data.mfa_required) {
+                mfaPreauthToken = data.mfa_token;
+                document.getElementById('dFormLoginPaso1').style.display = 'none';
+                document.getElementById('dFormLoginPaso2').style.display = 'block';
+                document.getElementById('dInputCodigoMFA').focus();
             } else {
                 localStorage.setItem('access_token', data.access_token);
-                actualizarUIUsuario(usuario);
-                mostrarApp();
+                await verificarAuth();
             }
         } catch (err) {
             errorDiv.textContent   = 'Error de conexión. Intente de nuevo.';
@@ -1829,192 +2231,281 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
         }
     }
 
+    async function completarLoginMFA(event) {
+        event.preventDefault();
+        const code = document.getElementById('dInputCodigoMFA').value.trim();
+        const errorDiv = document.getElementById('dLoginError');
+        const btn = document.getElementById('dBtnVerificarMFA');
 
-    /* ═══════════════════════════════════════════════════════════════
-       cerrarSesion()
-       Limpia el token, restaura la UI y regresa al login.
-    ═══════════════════════════════════════════════════════════════ */
+        if (!code || code.length !== 6) {
+            errorDiv.textContent = 'Ingresa el código TOTP de 6 dígitos.';
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i> Validando MFA...';
+
+        try {
+            const res = await fetch('/login/mfa', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ mfa_token: mfaPreauthToken, code })
+            });
+
+            const data = await res.json();
+            if (!res.ok) {
+                errorDiv.textContent = data.detail || 'Código TOTP incorrecto.';
+                errorDiv.style.display = 'block';
+            } else {
+                localStorage.setItem('access_token', data.access_token);
+                await verificarAuth();
+            }
+        } catch (e) {
+            errorDiv.textContent = 'Error de conexión durante validación MFA.';
+            errorDiv.style.display = 'block';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa fa-key me-2"></i> Verificar Código';
+        }
+    }
+
+    function cancelarLoginMFA() {
+        mfaPreauthToken = null;
+        document.getElementById('dFormLoginPaso1').style.display = 'block';
+        document.getElementById('dFormLoginPaso2').style.display = 'none';
+        document.getElementById('dInputCodigoMFA').value = '';
+    }
+
     function cerrarSesion() {
         localStorage.removeItem('access_token');
+        currentUserData = null;
+        limpiarInterfazSesion();
         document.getElementById('dInputUsuario').value  = '';
         document.getElementById('dInputPassword').value = '';
         document.getElementById('dLoginError').style.display = 'none';
-        // Restaurar pestaña y sección inicial
         cambiarPantalla('secFuente', document.getElementById('tabFuente'));
         mostrarLogin();
     }
 
+    /* ─── SETUP MODAL DE DOBLE FACTOR MFA ─── */
+    let esMFAObligatorio = false;
 
-    /* ═══════════════════════════════════════════════════════════════
-       actualizarContadorDocs(archivos)
-       Muestra la cantidad real de PDFs indexados.
-    ═══════════════════════════════════════════════════════════════ */
-    function actualizarContadorDocs(archivos) {
-        const el = document.getElementById('dContadorDocs');
-        if (el) el.textContent = archivos.length;
-    }
+    async function abrirSetupMFA(obligatorio = false, forceReset = false) {
+        esMFAObligatorio = obligatorio;
+        const modal = document.getElementById('lexiaModalSetupMFA');
+        const qrBox = document.getElementById('mfaQRContainer');
+        const keyInput = document.getElementById('mfaSecretKeyText');
+        const avisoOblig = document.getElementById('mfaAvisoObligatorio');
+        const btnCancel = document.getElementById('btnCancelarSetupMFA');
 
+        if (avisoOblig) avisoOblig.style.display = obligatorio ? 'block' : 'none';
+        if (btnCancel) btnCancel.style.display = obligatorio ? 'none' : 'inline-block';
 
-    /* ═══════════════════════════════════════════════════════════════
-       cargarArchivos()
-       GET /listar_archivos/ → puebla los selectores de Tutor y Lupa.
-    ═══════════════════════════════════════════════════════════════ */
-    async function cargarArchivos() {
-        try {
-            const response = await fetch('/listar_archivos/', { headers: getAuthHeaders() });
-            checkAuthError(response);
-            const data = await response.json();
-            const archivos = data.archivos || [];
-
-            // Actualizar contador en Fuente
-            actualizarContadorDocs(archivos);
-
-            // Actualizar ambos selectores (Tutor y Lupa)
-            ['dArchivoTutor', 'dArchivoLupa'].forEach(selId => {
-                const sel = document.getElementById(selId);
-                if (!sel) return;
-                const prev = sel.value;
-                sel.innerHTML = '<option value="">— Todos los documentos —</option>';
-                archivos.forEach(a => {
-                    const opt = document.createElement('option');
-                    opt.value = opt.textContent = a.split(/[\/\\]/).pop(); // solo nombre
-                    sel.appendChild(opt);
-                });
-                sel.value = prev;
-            });
-        } catch (err) {
-            console.error('Error al cargar archivos:', err);
-        }
-    }
-
-
-    /* ═══════════════════════════════════════════════════════════════
-       Fuente de conocimiento — Ingresar PDF
-       POST /buscar_en_pdf/ con archivo (sin keyword)
-    ═══════════════════════════════════════════════════════════════ */
-    document.getElementById('btnIngresarPDF').addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type   = 'file';
-        input.accept = 'application/pdf';
-        input.onchange = async () => {
-            const archivo = input.files[0];
-            if (!archivo) return;
-
-            const btn = document.getElementById('btnIngresarPDF');
-            btn.disabled  = true;
-            btn.innerHTML = '<i class="fa fa-spinner fa-spin me-2"></i> Procesando...';
-
-            const formData = new FormData();
-            formData.append('file', archivo);
-
-            try {
-                const res = await fetch('/buscar_en_pdf/', {
-                    method: 'POST',
-                    headers: getAuthHeaders(),
-                    body: formData
-                });
-                checkAuthError(res);
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.detail || 'Error al procesar');
-                mostrarFeedbackFuente(`✅ ${data.mensaje || 'Documento indexado correctamente.'}`, 'success');
-                cargarArchivos();
-            } catch (err) {
-                mostrarFeedbackFuente(`❌ ${err.message}`, 'error');
-            } finally {
-                btn.disabled  = false;
-                btn.innerHTML = '<i class="fa fa-cloud-arrow-up"></i> Ingresar PDF';
-            }
-        };
-        input.click();
-    });
-
-
-    /* ═══════════════════════════════════════════════════════════════
-       Fuente de conocimiento — Ver documentos
-       GET /listar_archivos/ → panel desplegable con opción de borrar
-    ═══════════════════════════════════════════════════════════════ */
-    document.getElementById('btnVerDocsFuente').addEventListener('click', async () => {
-        let panel = document.getElementById('dPanelDocumentos');
-        if (panel) { panel.remove(); return; } // toggle
-
-        panel = document.createElement('div');
-        panel.id = 'dPanelDocumentos';
-        panel.className = 'doc-card';
-        panel.style.marginTop = '1rem';
-        panel.innerHTML = `
-            <div class="doc-card-header">
-                <i class="fa fa-folder-open"></i>
-                <span class="doc-card-header-title">Documentos en el repositorio</span>
-            </div>
-            <div class="doc-card-body" id="dListaDocumentos">
-                <p style="color:var(--gray-400); font-size:.85rem;">
-                    <i class="fa fa-spinner fa-spin me-2"></i> Cargando...
-                </p>
-            </div>`;
-
-        // Insertar después del área de métricas
-        document.getElementById('secFuente').querySelector('.section-wrap').appendChild(panel);
+        qrBox.innerHTML = '<i class="fa fa-spinner fa-spin fa-2x text-navy"></i>';
+        keyInput.value = '';
+        ultimoFocoAntesDeModal = document.activeElement;
+        modal.style.display = 'flex';
+        modal.querySelector('.modal-custom-card')?.focus();
 
         try {
-            const res  = await fetch('/listar_archivos/', { headers: getAuthHeaders() });
-            checkAuthError(res);
-            const data = await res.json();
-            const archivos = (data.archivos || []).map(a => a.split(/[\/\\]/).pop());
-            const lista = document.getElementById('dListaDocumentos');
-
-            if (!archivos.length) {
-                lista.innerHTML = '<p style="color:var(--gray-400); font-size:.85rem;">No hay documentos indexados todavía.</p>';
-                return;
-            }
-
-            lista.innerHTML = archivos.map((a, i) => `
-                <div style="display:flex; align-items:center; justify-content:space-between;
-                            padding:.6rem 0; border-bottom:1px solid var(--gray-200);">
-                    <span style="font-size:.87rem; color:var(--gray-800);">
-                        <i class="fa fa-file-pdf me-2" style="color:#c53030;"></i>${a}
-                    </span>
-                    <button class="btn-secondary-despacho"
-                            style="padding:.28rem .6rem; font-size:.75rem;"
-                            onclick="borrarArchivo('${a}', this)">
-                        <i class="fa fa-trash"></i>
-                    </button>
-                </div>`).join('');
-        } catch (err) {
-            document.getElementById('dListaDocumentos').innerHTML =
-                `<p style="color:#c53030; font-size:.85rem;">Error: ${err.message}</p>`;
-        }
-    });
-
-
-    /* ═══════════════════════════════════════════════════════════════
-       borrarArchivo(filename, btn)
-       DELETE /borrar_archivo/{filename}
-    ═══════════════════════════════════════════════════════════════ */
-    async function borrarArchivo(filename, btn) {
-        if (!confirm(`¿Eliminar "${filename}" del repositorio? Esta acción no se puede deshacer.`)) return;
-        btn.disabled = true;
-        try {
-            const res = await fetch('/borrar_archivo/' + encodeURIComponent(filename), {
-                method: 'DELETE',
+            const url = forceReset ? '/mfa/setup?reset=true' : '/mfa/setup';
+            const res = await fetch(url, {
+                method: 'POST',
                 headers: getAuthHeaders()
             });
             checkAuthError(res);
             const data = await res.json();
-            if (res.ok) {
-                mostrarFeedbackFuente(`✅ ${data.mensaje}`, 'success');
-                // Cerrar y reabrir el panel para refrescar
-                document.getElementById('dPanelDocumentos')?.remove();
-                cargarArchivos();
-            } else {
-                mostrarFeedbackFuente(`❌ ${data.detail || 'No se pudo eliminar.'}`, 'error');
-            }
-        } catch (err) {
-            mostrarFeedbackFuente(`❌ ${err.message}`, 'error');
+            qrBox.innerHTML = `<img src="${data.qr_code_base64}" alt="Código QR MFA" style="width:160px; height:160px;" />`;
+            keyInput.value = data.secret_key;
+        } catch (e) {
+            mostrarAlertaCustom('Error', 'No se pudo generar el código QR de MFA.', 'error');
+            if (!obligatorio) modal.style.display = 'none';
         }
     }
 
+    function cerrarModalSetupMFA() {
+        if (esMFAObligatorio && currentUserData && !currentUserData.mfa_enabled) {
+            mostrarAlertaCustom('Activación Obligatoria', 'La activación del Doble Factor (MFA) es obligatoria para poder usar el sistema. Escanea el código QR e ingresa tu código de 6 dígitos.', 'error');
+            return;
+        }
+        document.getElementById('lexiaModalSetupMFA').style.display = 'none';
+        ultimoFocoAntesDeModal?.focus?.();
+    }
 
-    /* Feedback visual en Fuente de conocimiento */
+    function copiarClaveMFA() {
+        const text = document.getElementById('mfaSecretKeyText').value;
+        if (text) {
+            navigator.clipboard.writeText(text);
+            mostrarAlertaCustom('Éxito', 'Clave de MFA copiada al portapapeles.', 'success');
+        }
+    }
+
+    async function activarMFAConfirmado() {
+        const code = document.getElementById('mfaConfirmCodeInput').value.trim();
+        if (!code || code.length !== 6) {
+            mostrarAlertaCustom('Atención', 'Ingresa el código de 6 dígitos de tu app Authenticator.', 'error');
+            return;
+        }
+
+        try {
+            const res = await fetch('/mfa/enable', {
+                method: 'POST',
+                headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify({ code })
+            });
+            checkAuthError(res);
+            const data = await res.json();
+            if (!res.ok) {
+                mostrarAlertaCustom('Error', data.detail || 'Código incorrecto.', 'error');
+            } else {
+                if (currentUserData) currentUserData.mfa_enabled = true;
+                esMFAObligatorio = false;
+                document.getElementById('lexiaModalSetupMFA').style.display = 'none';
+                document.getElementById('mfaConfirmCodeInput').value = '';
+                mostrarAlertaCustom('MFA Activado con Éxito', 'La autenticación de doble factor ha sido configurada correctamente en tu cuenta.', 'success');
+            }
+        } catch (e) {
+            mostrarAlertaCustom('Error', 'Error al activar MFA.', 'error');
+        }
+    }
+
+    /* ─── REPOSITORIO DE ARCHIVOS Y BUSQUEDA ─── */
+    function actualizarContadorDocs(archivos) {
+        document.getElementById('dMetricTotalDocs').textContent = archivos.length;
+    }
+
+    function actualizarNombreArchivo(input) {
+        const divTexto = document.getElementById('dNombreSeleccionado');
+        const txt      = document.getElementById('dNombreFileTexto');
+        const btn      = document.getElementById('dBtnSubirFile');
+
+        if (input.files && input.files[0]) {
+            txt.textContent = input.files[0].name;
+            divTexto.style.display = 'block';
+            btn.disabled = false;
+        } else {
+            divTexto.style.display = 'none';
+            btn.disabled = true;
+        }
+    }
+
+    async function subirDocumento(event) {
+        event.preventDefault();
+        const inputFile = document.getElementById('dInputFile');
+        const btn       = document.getElementById('dBtnSubirFile');
+
+        if (!inputFile.files || !inputFile.files[0]) return;
+
+        btn.disabled  = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Ingestando en ChromaDB...';
+
+        const formData = new FormData();
+        formData.append('file', inputFile.files[0]);
+
+        try {
+            const res = await fetch('/buscar_en_pdf/', {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: formData
+            });
+            checkAuthError(res);
+            const data = await res.json();
+            if (res.ok) {
+                mostrarFeedbackFuente(`✅ ${data.mensaje || 'Documento procesado.'}`, 'success');
+                inputFile.value = '';
+                actualizarNombreArchivo(inputFile);
+                cargarArchivos();
+            } else {
+                mostrarFeedbackFuente(`❌ ${data.detail || 'Error en ingesta.'}`, 'error');
+            }
+        } catch (err) {
+            mostrarFeedbackFuente(`❌ ${err.message}`, 'error');
+        } finally {
+            btn.disabled  = false;
+            btn.innerHTML = '<i class="fa-solid fa-bolt me-1"></i> Procesar e Ingestar Documento';
+        }
+    }
+
+    async function cargarArchivos() {
+        try {
+            const res = await fetch('/listar_archivos/', { headers: getAuthHeaders() });
+            checkAuthError(res);
+            const data = await res.json();
+            const archivos = data.archivos || [];
+
+            actualizarContadorDocs(archivos);
+
+            // Poblar selectores de filtro
+            const selects = ['dArchivoTutor', 'dArchivoLupa'];
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const valActual = el.value;
+                el.replaceChildren();
+                el.add(new Option('Todos los documentos', ''));
+                archivos.forEach(a => el.add(new Option(String(a), String(a), false, a === valActual)));
+            });
+
+            const lista = document.getElementById('dListaDocumentos');
+            if (!archivos.length) {
+                lista.innerHTML = '<p style="color:var(--gray-400); font-size:.85rem;">' +
+                    '<i class="fa-solid fa-folder-open me-2"></i> No hay documentos indexados en tu repositorio.</p>';
+                return;
+            }
+
+            lista.innerHTML = archivos.map(f => {
+                const filenameSeguro = escapeHTML(f);
+                return `
+                <div class="repo-documento-item" data-nombre-documento="${filenameSeguro}" style="display:flex; align-items:center; justify-content:space-between;
+                            padding:.75rem 1rem; background:var(--gray-50);
+                            border:1px solid var(--gray-200); border-radius:var(--radius-sm); margin-bottom:.5rem;">
+                    <div style="display:flex; align-items:center; gap:.8rem;">
+                        <i class="fa-solid fa-file-pdf" style="color:#c53030; font-size:1.2rem;"></i>
+                        <span style="font-size:.88rem; font-weight:600; color:var(--navy);">${filenameSeguro}</span>
+                    </div>
+                    <button type="button" class="btn-secondary-despacho btn-borrar-documento"
+                            data-filename="${filenameSeguro}" aria-label="Eliminar ${filenameSeguro}"
+                            style="color:#c53030; padding:.35rem .55rem;" title="Eliminar documento">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>`;
+            }).join('');
+            lista.querySelectorAll('.btn-borrar-documento').forEach(btn => {
+                btn.addEventListener('click', () => borrarArchivo(btn.dataset.filename));
+            });
+            filtrarDocumentosRepositorio();
+        } catch (err) {
+            document.getElementById('dListaDocumentos').innerHTML =
+                `<p style="color:#c53030; font-size:.85rem;">Error: ${escapeHTML(err.message)}</p>`;
+        }
+    }
+
+    function borrarArchivo(filename) {
+        mostrarConfirmacionCustom(
+            'Eliminar Documento',
+            `¿Estás seguro de eliminar permanentemente "${filename}" de tu repositorio y de la base vectorial ChromaDB?`,
+            async () => {
+                try {
+                    const res = await fetch('/borrar_archivo/' + encodeURIComponent(filename), {
+                        method: 'DELETE',
+                        headers: getAuthHeaders()
+                    });
+                    checkAuthError(res);
+                    const data = await res.json();
+                    if (res.ok) {
+                        mostrarFeedbackFuente(`✅ ${data.mensaje}`, 'success');
+                        cargarArchivos();
+                    } else {
+                        mostrarFeedbackFuente(`❌ ${data.detail || 'No se pudo eliminar.'}`, 'error');
+                    }
+                } catch (err) {
+                    mostrarFeedbackFuente(`❌ ${err.message}`, 'error');
+                }
+            }
+        );
+    }
+
     function mostrarFeedbackFuente(mensaje, tipo) {
         let fb = document.getElementById('dFeedbackFuente');
         if (!fb) {
@@ -2031,11 +2522,7 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
         setTimeout(() => fb?.remove(), 6000);
     }
 
-
-    /* ═══════════════════════════════════════════════════════════════
-       TUTOR VIRTUAL
-       POST /preguntar_tutor/?pregunta=...&filename_filter=...
-    ═══════════════════════════════════════════════════════════════ */
+    /* ─── TUTOR IA ─── */
     async function preguntarTutor() {
         const input    = document.getElementById('dInputConsulta');
         const pregunta = input.value.trim();
@@ -2043,14 +2530,13 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
 
         const btn      = document.getElementById('dBtnEnviar');
         const chatArea = document.getElementById('dChatArea');
+        const requestGeneration = uiSessionGeneration;
 
-        // Limpiar estado vacío y agregar mensaje del usuario
         const vacios = chatArea.querySelectorAll('.transcript-empty');
         vacios.forEach(v => v.remove());
         appendMensaje(pregunta, 'user', chatArea);
         input.value = '';
 
-        // Indicador de carga
         const loadId = 'load-' + Date.now();
         chatArea.innerHTML += `<div id="${loadId}" class="msg msg-bot">
             <div class="bot-avatar"><i class="fa fa-robot"></i></div>
@@ -2072,6 +2558,7 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             });
             checkAuthError(res);
             const data = await res.json();
+            if (requestGeneration !== uiSessionGeneration) return;
             document.getElementById(loadId)?.remove();
 
             if (!res.ok) {
@@ -2080,9 +2567,11 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
                 appendMensaje(data.respuesta, 'bot', chatArea);
             }
         } catch (err) {
+            if (requestGeneration !== uiSessionGeneration) return;
             document.getElementById(loadId)?.remove();
             appendMensaje('Error de conexión. Intente de nuevo.', 'bot', chatArea);
         } finally {
+            if (requestGeneration !== uiSessionGeneration) return;
             btn.disabled  = false;
             btn.innerHTML = '<i class="fa fa-paper-plane"></i> Enviar';
             chatArea.scrollTop = chatArea.scrollHeight;
@@ -2092,16 +2581,80 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
     function appendMensaje(texto, tipo, contenedor) {
         const div = document.createElement('div');
         div.className = 'msg ' + (tipo === 'user' ? 'msg-user' : 'msg-bot');
-        // Formato: **negrita** y \n → <br>
-        let fmt = texto.replace(/\*{1,2}(.*?)\*{1,2}/g, '<strong>$1</strong>')
-                       .replace(/\n/g, '<br>');
         if (tipo === 'user') {
-            div.innerHTML = `<div class="bubble">${fmt}</div>`;
+            div.innerHTML = `<div class="bubble">${safeInlineFormat(texto)}</div>`;
         } else {
+            const contenido = formatearRespuestaTutor(texto);
             div.innerHTML = `<div class="bot-avatar"><i class="fa fa-robot"></i></div>
-                             <div class="bubble">${fmt}</div>`;
+                             <div class="answer-wrap">
+                                 <div class="bubble">${contenido}</div>
+                                 <div class="answer-actions">
+                                     <button type="button" class="btn-copy-answer" title="Copiar respuesta">
+                                         <i class="fa-regular fa-copy me-1"></i> Copiar
+                                     </button>
+                                 </div>
+                             </div>`;
+            div.querySelector('.btn-copy-answer')?.addEventListener('click', event => {
+                copiarRespuestaTutor(event.currentTarget, String(texto ?? ''));
+            });
         }
         contenedor.appendChild(div);
+    }
+
+    function filtrarDocumentosRepositorio() {
+        const consulta = document.getElementById('dBuscarDocumento')?.value.trim().toLocaleLowerCase('es') || '';
+        const elementos = [...document.querySelectorAll('.repo-documento-item')];
+        let visibles = 0;
+        elementos.forEach(elemento => {
+            const coincide = !consulta || (elemento.dataset.nombreDocumento || '').toLocaleLowerCase('es').includes(consulta);
+            elemento.style.display = coincide ? 'flex' : 'none';
+            if (coincide) visibles += 1;
+        });
+        let vacio = document.getElementById('dRepositorioSinCoincidencias');
+        if (consulta && elementos.length && !visibles) {
+            if (!vacio) {
+                vacio = document.createElement('p');
+                vacio.id = 'dRepositorioSinCoincidencias';
+                vacio.style.cssText = 'color:var(--gray-600); font-size:.82rem; padding:.6rem 0;';
+                document.getElementById('dListaDocumentos').appendChild(vacio);
+            }
+            vacio.textContent = 'No hay documentos que coincidan con la búsqueda.';
+        } else {
+            vacio?.remove();
+        }
+    }
+
+    function formatearRespuestaTutor(texto) {
+        const respuesta = String(texto ?? '');
+        const marcador = 'fuentes consultadas:';
+        const posicion = respuesta.toLocaleLowerCase('es').lastIndexOf(marcador);
+        if (posicion < 0) return safeInlineFormat(respuesta);
+
+        const cuerpo = respuesta.slice(0, posicion).trim();
+        const fuentes = respuesta.slice(posicion + marcador.length)
+            .split(';')
+            .map(fuente => fuente.trim().replace(/[.]+$/, ''))
+            .filter(Boolean);
+        if (!fuentes.length) return safeInlineFormat(respuesta);
+
+        return `${safeInlineFormat(cuerpo)}
+            <div class="source-block">
+                <div class="source-block-title"><i class="fa-solid fa-book-open me-1"></i> Fuentes consultadas</div>
+                <div class="source-list">${fuentes.map(fuente =>
+                    `<span class="source-chip"><i class="fa-regular fa-file-pdf"></i>${escapeHTML(fuente)}</span>`
+                ).join('')}</div>
+            </div>`;
+    }
+
+    async function copiarRespuestaTutor(boton, texto) {
+        try {
+            await navigator.clipboard.writeText(texto);
+            const contenidoAnterior = boton.innerHTML;
+            boton.innerHTML = '<i class="fa-solid fa-check me-1"></i> Copiada';
+            setTimeout(() => { boton.innerHTML = contenidoAnterior; }, 1600);
+        } catch (error) {
+            mostrarAlertaCustom('No se pudo copiar', 'Selecciona el texto de la respuesta y cópialo manualmente.', 'error');
+        }
     }
 
     function usarSugerencia(elemento) {
@@ -2109,13 +2662,7 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
         if (input) { input.value = elemento.textContent.trim(); input.focus(); }
     }
 
-
-    /* ═══════════════════════════════════════════════════════════════
-       GLOSARIO INTELIGENTE
-       POST /agregar_termino/ — genera ficha jurídica con IA
-       GET /listar_terminos/  — lista fichas guardadas
-       DELETE /borrar_historial/ / /borrar_termino/{palabra}
-    ═══════════════════════════════════════════════════════════════ */
+    /* ─── GLOSARIO INTELIGENTE ─── */
     async function generarFicha() {
         const palabra  = document.getElementById('dTerminoPalabra').value.trim();
         const materia  = document.getElementById('dTerminoMateria').value.trim();
@@ -2140,124 +2687,166 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
                 body: JSON.stringify({ palabra, materia, definicion_tecnica: '' })
             });
             checkAuthError(res);
-            if (!res.ok) throw new Error('Error al generar ficha');
+            if (!res.ok) {
+                const errorDetail = await res.json().catch(() => ({}));
+                throw new Error(errorDetail.detail || 'Error al generar ficha');
+            }
             const data = await res.json();
 
-            const mnemo = (data.mnemotecnia || '').replace(/\*{1,2}(.*?)\*{1,2}/g, '<strong>$1</strong>');
+            const palabraSegura = escapeHTML(data.palabra);
+            const materiaSegura = escapeHTML(data.materia);
+            const definicionSegura = safeInlineFormat(data.definicion_tecnica);
+            const explicacionSegura = safeInlineFormat(data.explicacion_sencilla);
+            const mnemo = safeInlineFormat(data.mnemotecnia);
             resultado.innerHTML = `
                 <div style="background:var(--gray-50); border:1px solid var(--gray-200);
-                            border-radius:var(--radius-md); padding:1.2rem 1.5rem; margin-top:.5rem;">
+                             border-radius:var(--radius-md); padding:1.2rem 1.5rem; margin-top:.5rem;">
+                    <div style="font-size:.78rem; font-weight:700; margin-bottom:.65rem; color:${data.existente ? '#8a6519' : '#276749'};">
+                        <i class="fa ${data.existente ? 'fa-circle-info' : 'fa-circle-check'} me-1"></i>
+                        ${data.existente
+                            ? 'Esta combinación de término y materia ya existía. Se muestra la ficha guardada y no se generó otra.'
+                            : 'Ficha generada y registrada correctamente.'}
+                    </div>
                     <h5 style="font-family:var(--font-serif); color:var(--navy); margin-bottom:.8rem;">
-                        ${data.palabra}
+                        ${palabraSegura}
                         <span style="font-family:var(--font-sans); font-size:.7rem; font-weight:600;
                                      background:var(--gold-pale); color:#7a5c1e; border-radius:30px;
-                                     padding:.2rem .7rem; margin-left:.6rem;">${data.materia}</span>
+                                     padding:.2rem .7rem; margin-left:.6rem;">${materiaSegura}</span>
                     </h5>
                     <p style="font-size:.87rem; color:var(--gray-800); margin-bottom:.5rem;">
-                        <strong>Definición:</strong> ${data.definicion_tecnica}</p>
+                        <strong>Definición:</strong> ${definicionSegura}</p>
                     <p style="font-size:.87rem; color:var(--gray-800); margin-bottom:.5rem;">
-                        <strong>Explicación sencilla:</strong> ${data.explicacion_sencilla}</p>
+                        <strong>Explicación sencilla:</strong> ${explicacionSegura}</p>
                     ${mnemo ? `<p style="font-size:.87rem; color:var(--gray-600); margin-bottom:0;">
                         <i class="fa fa-lightbulb me-1" style="color:var(--gold);"></i>
-                        <strong>Mnemotecnia:</strong> ${mnemo}</p>` : ''}
+                         <strong>Mnemotecnia:</strong> ${mnemo}</p>` : ''}
                 </div>`;
+            document.getElementById('dBuscarFicha').value = data.palabra || palabra;
+            await cargarFichasGuardadas(data.palabra || palabra);
         } catch (err) {
             resultado.innerHTML = `<div style="color:#c53030; font-size:.85rem; padding:.5rem 0;">
-                <i class="fa fa-circle-xmark me-1"></i> ${err.message}</div>`;
+                <i class="fa fa-circle-xmark me-1"></i> ${escapeHTML(err.message)}</div>`;
         } finally {
             btn.disabled  = false;
             btn.innerHTML = '<i class="fa fa-wand-magic-sparkles"></i> Generar ficha';
         }
     }
 
-    async function cargarFichasGuardadas() {
+    async function cargarFichasGuardadas(termino = null) {
         const card       = document.getElementById('dCardFichasGuardadas');
         const contenedor = document.getElementById('dContenedorFichas');
+        const buscador = document.getElementById('dBuscarFicha');
+        const resumen = document.getElementById('dResumenBusquedaFichas');
+        const filtro = termino === null ? (buscador?.value.trim() || '') : String(termino).trim();
         card.style.display = 'block';
         contenedor.innerHTML = '<p style="color:var(--gray-400); font-size:.85rem;">' +
             '<i class="fa fa-spinner fa-spin me-2"></i> Cargando fichas...</p>';
 
         try {
-            const res = await fetch('/listar_terminos/', { headers: getAuthHeaders() });
+            const url = filtro
+                ? '/buscar_terminos/?termino=' + encodeURIComponent(filtro)
+                : '/listar_terminos/';
+            const res = await fetch(url, { headers: getAuthHeaders() });
             checkAuthError(res);
+            if (!res.ok) throw new Error('No se pudieron cargar las fichas.');
             const terms = await res.json();
+            resumen.textContent = filtro
+                ? `${terms.length} resultado(s) para “${filtro}”.`
+                : `${terms.length} ficha(s) registrada(s).`;
 
             if (!Array.isArray(terms) || !terms.length) {
                 contenedor.innerHTML = '<p style="color:var(--gray-400); font-size:.85rem; padding:1rem 0;">' +
-                    '<i class="fa fa-folder-open me-2"></i> No tienes fichas guardadas aún.</p>';
+                    `<i class="fa fa-folder-open me-2"></i> ${filtro
+                        ? 'No se encontraron fichas que coincidan con ese término.'
+                        : 'No tienes fichas guardadas aún.'}</p>`;
                 return;
             }
 
             contenedor.innerHTML = terms.map(t => {
-                const mnemo = (t.mnemotecnia || '').replace(/\*{1,2}(.*?)\*{1,2}/g, '<strong>$1</strong>');
+                const palabra = escapeHTML(t.palabra || '—');
+                const materia = escapeHTML(t.materia || '');
+                const definicion = safeInlineFormat(t.definicion_tecnica || '');
+                const explicacion = safeInlineFormat(t.explicacion_sencilla || '');
+                const mnemo = safeInlineFormat(t.mnemotecnia || '');
                 return `
                     <div style="background:var(--white); border:1px solid var(--gray-200);
                                 border-radius:var(--radius-md); padding:1.2rem; position:relative;">
-                        <button onclick="eliminarFicha('${t.palabra}', this)"
+                        <button type="button" class="btn-eliminar-ficha" data-id="${Number(t.id)}"
+                                data-palabra="${palabra}" data-materia="${materia}"
                                 style="position:absolute; top:.8rem; right:.8rem; background:none;
-                                       border:none; color:var(--gray-400); cursor:pointer; font-size:.85rem;"
-                                title="Eliminar ficha">
+                                        border:none; color:var(--gray-400); cursor:pointer; font-size:.85rem;"
+                                title="Eliminar ficha" aria-label="Eliminar ficha ${palabra}">
                             <i class="fa fa-trash"></i>
                         </button>
-                        ${t.materia ? `<span style="font-size:.68rem; font-weight:600; background:var(--gold-pale);
-                                       color:#7a5c1e; border-radius:30px; padding:.2rem .7rem;">${t.materia}</span>` : ''}
-                        <h6 style="font-family:var(--font-serif); color:var(--navy);
-                                   margin:.5rem 0 .5rem;">${t.palabra || '—'}</h6>
-                        ${t.definicion_tecnica ? `<p style="font-size:.8rem; color:var(--gray-800); margin-bottom:.3rem;">
-                            <strong>Definición:</strong> ${t.definicion_tecnica}</p>` : ''}
-                        ${t.explicacion_sencilla ? `<p style="font-size:.8rem; color:var(--gray-800); margin-bottom:.3rem;">
-                            <strong>Explicación:</strong> ${t.explicacion_sencilla}</p>` : ''}
+                         ${materia ? `<span style="font-size:.68rem; font-weight:600; background:var(--gold-pale);
+                                        color:#7a5c1e; border-radius:30px; padding:.2rem .7rem;">${materia}</span>` : ''}
+                         <h6 style="font-family:var(--font-serif); color:var(--navy);
+                                    margin:.5rem 0 .5rem;">${palabra}</h6>
+                         ${definicion ? `<p style="font-size:.8rem; color:var(--gray-800); margin-bottom:.3rem;">
+                             <strong>Definición:</strong> ${definicion}</p>` : ''}
+                         ${explicacion ? `<p style="font-size:.8rem; color:var(--gray-800); margin-bottom:.3rem;">
+                             <strong>Explicación:</strong> ${explicacion}</p>` : ''}
                         ${mnemo ? `<p style="font-size:.78rem; color:var(--gray-600); margin-bottom:0;">
                             <i class="fa fa-lightbulb me-1" style="color:var(--gold);"></i>${mnemo}</p>` : ''}
                     </div>`;
             }).join('');
+            contenedor.querySelectorAll('.btn-eliminar-ficha').forEach(btn => {
+                btn.addEventListener('click', () => eliminarFicha(
+                    Number(btn.dataset.id), btn.dataset.palabra, btn.dataset.materia
+                ));
+            });
         } catch (err) {
-            contenedor.innerHTML = `<p style="color:#c53030; font-size:.85rem;">Error: ${err.message}</p>`;
+            contenedor.innerHTML = `<p style="color:#c53030; font-size:.85rem;">Error: ${escapeHTML(err.message)}</p>`;
         }
     }
 
-    async function eliminarFicha(palabra, btn) {
-        if (!confirm(`¿Eliminar la ficha de "${palabra}"?`)) return;
-        btn.disabled = true;
-        try {
-            const res = await fetch('/borrar_termino/' + encodeURIComponent(palabra), {
-                method: 'DELETE',
-                headers: getAuthHeaders()
-            });
-            checkAuthError(res);
-            if (res.ok) cargarFichasGuardadas();
-            else {
-                const data = await res.json();
-                alert(data.detail || 'No se pudo eliminar la ficha.');
+    function eliminarFicha(fichaId, palabra, materia) {
+        mostrarConfirmacionCustom(
+            'Eliminar Ficha Jurídica',
+            `¿Deseas eliminar la ficha "${palabra}" de la materia "${materia}"?`,
+            async () => {
+                try {
+                    const res = await fetch('/borrar_termino_id/' + encodeURIComponent(fichaId), {
+                        method: 'DELETE',
+                        headers: getAuthHeaders()
+                    });
+                    checkAuthError(res);
+                    if (res.ok) cargarFichasGuardadas();
+                    else {
+                        const data = await res.json();
+                        mostrarAlertaCustom('Error', data.detail || 'No se pudo eliminar la ficha.', 'error');
+                    }
+                } catch (err) {
+                    mostrarAlertaCustom('Error', 'Error de conexión al eliminar la ficha.', 'error');
+                }
             }
-        } catch (err) {
-            alert('Error de conexión.');
-        }
+        );
     }
 
-    async function borrarHistorial() {
-        if (!confirm('¿Borrar todo el historial del glosario? Esta acción no se puede deshacer.')) return;
-        try {
-            const res = await fetch('/borrar_historial/', {
-                method: 'DELETE',
-                headers: getAuthHeaders()
-            });
-            checkAuthError(res);
-            const data = await res.json();
-            document.getElementById('dResultadoGlosario').innerHTML =
-                `<div style="color:#276749; font-size:.85rem; padding:.5rem 0;">
-                    <i class="fa fa-circle-check me-1"></i> ${data.mensaje}</div>`;
-            document.getElementById('dCardFichasGuardadas').style.display = 'none';
-        } catch (err) {
-            alert('Error al borrar historial.');
-        }
+    function borrarHistorial() {
+        mostrarConfirmacionCustom(
+            'Vaciar Diccionario del Despacho',
+            '¿Deseas borrar todos los términos del diccionario? Esta acción no se puede deshacer.',
+            async () => {
+                try {
+                    const res = await fetch('/borrar_historial/', {
+                        method: 'DELETE',
+                        headers: getAuthHeaders()
+                    });
+                    checkAuthError(res);
+                    const data = await res.json();
+                    document.getElementById('dResultadoGlosario').innerHTML =
+                        `<div style="color:#276749; font-size:.85rem; padding:.5rem 0;">
+                            <i class="fa fa-circle-check me-1"></i> ${escapeHTML(data.mensaje)}</div>`;
+                    await cargarFichasGuardadas();
+                } catch (err) {
+                    mostrarAlertaCustom('Error', 'Error al borrar historial.', 'error');
+                }
+            }
+        );
     }
 
-
-    /* ═══════════════════════════════════════════════════════════════
-       LUPA LEGAL
-       POST /buscar_en_pdf/ con keyword y filename_filter opcional
-    ═══════════════════════════════════════════════════════════════ */
+    /* ─── LUPA LEGAL ─── */
     async function buscarFragmento() {
         const keyword  = document.getElementById('dKeywordLupa').value.trim();
         const archivo  = document.getElementById('dArchivoLupa')?.value || '';
@@ -2289,8 +2878,7 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             const data = await res.json();
 
             if (data.encontrado) {
-                // Resaltar la frase buscada en el fragmento
-                let texto = data.fragmento.replace(/[\r\n]+/g, ' ').trim();
+                let texto = data.fragmento;
                 const fraseSegura = keyword.trim()
                     .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
                     .split(/\s+/).join('\\s+');
@@ -2298,12 +2886,11 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
                     '<mark style="background:#fef08a; color:#1e293b; font-weight:700; ' +
                     'padding:1px 3px; border-radius:3px;">$1</mark>');
                 resultado.innerHTML = `
-                    <p style="font-size:.8rem; color:var(--gray-400); margin-bottom:.8rem;">
-                        <i class="fa fa-file-pdf me-1" style="color:#c53030;"></i>
-                        ${archivo || 'Todos los documentos'}
-                    </p>
-                    <p style="font-size:.9rem; color:var(--gray-800); line-height:1.7;
-                               text-align:justify;"><i>"${texto}"</i></p>`;
+                    <div style="font-size:.82rem; color:var(--gray-600); margin-bottom:1rem; font-weight:600;">
+                        <i class="fa-solid fa-folder-open me-1" style="color:var(--navy);"></i>
+                        Origen de búsqueda: <span>${archivo ? "Archivo: " + escapeHTML(archivo) : "Todos los documentos"}</span>
+                    </div>
+                    ${texto}`;
             } else {
                 resultado.innerHTML = '<div class="transcript-empty">' +
                     '<i class="fa fa-magnifying-glass"></i>' +
@@ -2311,20 +2898,14 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             }
         } catch (err) {
             resultado.innerHTML = `<p style="color:#c53030; text-align:center; font-size:.85rem;">
-                Error: ${err.message}</p>`;
+                Error: ${escapeHTML(err.message)}</p>`;
         } finally {
             btn.disabled  = false;
             btn.innerHTML = '<i class="fa fa-magnifying-glass"></i> Buscar';
         }
     }
 
-
-    /* ═══════════════════════════════════════════════════════════════
-       GESTIÓN DE USUARIOS (Admin)
-       GET  /admin/usuarios
-       POST /admin/crear_usuario
-       DELETE /admin/borrar_usuario/{username}
-    ═══════════════════════════════════════════════════════════════ */
+    /* ─── GESTIÓN DE USUARIOS (ADMIN) ─── */
     async function cargarUsuariosAdmin() {
         const tbody = document.getElementById('dTablaUsuarios');
         tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--gray-400);
@@ -2343,36 +2924,63 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
                 return;
             }
 
-            tbody.innerHTML = users.map((u, i) => `
+            const currentUname = currentUserData ? currentUserData.username : '';
+
+            tbody.innerHTML = users.map((u, i) => {
+                const uname = typeof u === 'string' ? u : u.username;
+                const unameSeguro = escapeHTML(uname);
+                const isAdmin = typeof u === 'object' ? Boolean(u.is_admin) : false;
+                const esYo = uname === currentUname;
+
+                return `
                 <tr>
                     <td style="color:var(--gray-400); font-size:.8rem;">${String(i+1).padStart(3,'0')}</td>
-                    <td class="term-cell">${u}</td>
-                    <td>${u === ADMIN_USERNAME
+                    <td class="term-cell">${unameSeguro} ${esYo ? '<span style="font-size:.7rem; color:var(--gold); font-weight:700;">(Tú)</span>' : ''}</td>
+                    <td>${isAdmin
                         ? '<span class="rama-badge rama-constitucional">Administrador</span>'
                         : '<span class="rama-badge rama-civil">Estándar</span>'}</td>
-                    <td>${u === ADMIN_USERNAME
-                        ? '<span style="font-size:.75rem; color:var(--gray-400);">— cuenta raíz —</span>'
-                        : `<button class="btn-secondary-despacho"
+                    <td>${esYo || isAdmin
+                        ? '<span style="font-size:.75rem; color:var(--gray-400);">— cuenta protegida —</span>'
+                        : `<button type="button" class="btn-secondary-despacho btn-borrar-usuario" data-username="${unameSeguro}"
                                    style="padding:.28rem .6rem; font-size:.75rem;"
-                                   onclick="borrarUsuarioAdmin('${u}', this)">
+                                   aria-label="Eliminar usuario ${unameSeguro}">
                                <i class="fa fa-trash"></i> Eliminar
                            </button>`
                     }</td>
-                </tr>`).join('');
+                </tr>`;
+            }).join('');
+            tbody.querySelectorAll('.btn-borrar-usuario').forEach(btn => {
+                btn.addEventListener('click', () => borrarUsuarioAdmin(btn.dataset.username));
+            });
         } catch (err) {
             tbody.innerHTML = `<tr><td colspan="4" style="color:#c53030; padding:1rem; font-size:.85rem;">
-                Error: ${err.message}</td></tr>`;
+                Error: ${escapeHTML(err.message)}</td></tr>`;
         }
     }
 
     async function crearUsuarioAdmin() {
-        const nombre  = document.getElementById('dNuevoNombre').value.trim();
-        const pass    = document.getElementById('dNuevoPass').value.trim();
-        const alertEl = document.getElementById('dAdminAlert');
-        const btn     = document.getElementById('dBtnRegistrar');
+        const nombre      = document.getElementById('dNuevoNombre').value.trim();
+        const pass        = document.getElementById('dNuevoPass').value;
+        const passConfirm = document.getElementById('dNuevoPassConfirm').value;
+        const btn         = document.getElementById('dBtnRegistrar');
 
-        if (!nombre || !pass) {
-            mostrarAlertAdmin('Ingresa nombre de usuario y contraseña.', 'error');
+        if (!nombre || !pass || !passConfirm) {
+            mostrarAlertAdmin('Por favor completa todos los campos requeridos.', 'error');
+            return;
+        }
+
+        if (!/^[a-zA-Z0-9_]{3,50}$/.test(nombre)) {
+            mostrarAlertAdmin('El nombre de usuario solo puede contener letras, números y guiones bajos (mínimo 3 caracteres, sin espacios ni caracteres especiales).', 'error');
+            return;
+        }
+
+        if (pass.length < 6) {
+            mostrarAlertAdmin('La contraseña debe tener al menos 6 caracteres.', 'error');
+            return;
+        }
+
+        if (pass !== passConfirm) {
+            mostrarAlertAdmin('Las contraseñas no coinciden. Por favor verifícalas.', 'error');
             return;
         }
 
@@ -2388,43 +2996,55 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
             checkAuthError(res);
             const data = await res.json();
             if (!res.ok) {
-                let msg = data.detail || 'Error al crear usuario.';
-                if (res.status === 400) msg = 'Este nombre de usuario ya está en uso.';
-                if (res.status === 403) msg = 'No tienes permisos de administrador.';
+                let msg = 'Error al crear usuario.';
+                if (data.errors && Array.isArray(data.errors) && data.errors.length > 0 && data.errors[0].msg) {
+                    msg = data.errors[0].msg;
+                } else if (data.detail) {
+                    msg = typeof data.detail === 'string' ? data.detail : JSON.stringify(data.detail);
+                } else if (res.status === 400) {
+                    msg = 'Este nombre de usuario ya está en uso o no cumple con los requisitos.';
+                } else if (res.status === 403) {
+                    msg = 'No tienes permisos de administrador.';
+                }
                 mostrarAlertAdmin(msg, 'error');
             } else {
                 mostrarAlertAdmin('✅ ' + (data.mensaje || 'Usuario creado exitosamente.'), 'success');
                 document.getElementById('dNuevoNombre').value = '';
-                document.getElementById('dNuevoPass').value  = '';
+                document.getElementById('dNuevoPass').value = '';
+                document.getElementById('dNuevoPassConfirm').value = '';
                 cargarUsuariosAdmin();
             }
         } catch (err) {
-            mostrarAlertAdmin('Error de conexión.', 'error');
+            mostrarAlertAdmin(err.message || 'Error de conexión.', 'error');
         } finally {
             btn.disabled  = false;
-            btn.innerHTML = '<i class="fa fa-user-plus"></i> Registrar usuario';
+            btn.innerHTML = '<i class="fa-solid fa-user-plus me-1"></i> Registrar usuario';
         }
     }
 
-    async function borrarUsuarioAdmin(username, btn) {
-        if (!confirm(`¿Eliminar permanentemente al usuario "${username}" y todos sus archivos? Esta acción no se puede deshacer.`)) return;
-        btn.disabled = true;
-        try {
-            const res = await fetch('/admin/borrar_usuario/' + encodeURIComponent(username), {
-                method: 'DELETE',
-                headers: getAuthHeaders()
-            });
-            checkAuthError(res);
-            const data = await res.json();
-            if (res.ok) {
-                mostrarAlertAdmin('✅ ' + (data.mensaje || 'Usuario eliminado.'), 'success');
-                cargarUsuariosAdmin();
-            } else {
-                mostrarAlertAdmin(data.detail || 'No se pudo eliminar.', 'error');
+    function borrarUsuarioAdmin(username) {
+        mostrarConfirmacionCustom(
+            'Eliminar Usuario',
+            `¿Estás seguro de eliminar permanentemente al usuario "${username}" y todos sus archivos físicos? Esta acción no se puede deshacer.`,
+            async () => {
+                try {
+                    const res = await fetch('/admin/borrar_usuario/' + encodeURIComponent(username), {
+                        method: 'DELETE',
+                        headers: getAuthHeaders()
+                    });
+                    checkAuthError(res);
+                    const data = await res.json();
+                    if (res.ok) {
+                        mostrarAlertAdmin('✅ ' + (data.mensaje || 'Usuario eliminado.'), 'success');
+                        cargarUsuariosAdmin();
+                    } else {
+                        mostrarAlertAdmin(data.detail || 'No se pudo eliminar.', 'error');
+                    }
+                } catch (err) {
+                    mostrarAlertAdmin('Error de conexión.', 'error');
+                }
             }
-        } catch (err) {
-            mostrarAlertAdmin('Error de conexión.', 'error');
-        }
+        );
     }
 
     function mostrarAlertAdmin(msg, tipo) {
@@ -2438,33 +3058,116 @@ Descripción: Diseño alternativo #2 — Estilo Despacho Jurídico.
         setTimeout(() => { el.style.display = 'none'; }, 5000);
     }
 
+    function actualizarFortalezaPassword(valor) {
+        const barra = document.getElementById('dPasswordMeter');
+        const ayuda = document.getElementById('dPasswordHelp');
+        if (!barra || !ayuda) return;
+        let puntos = 0;
+        if (valor.length >= 6) puntos += 1;
+        if (valor.length >= 10) puntos += 1;
+        if (/[a-z]/.test(valor) && /[A-Z]/.test(valor)) puntos += 1;
+        if (/\d/.test(valor)) puntos += 1;
+        if (/[^a-zA-Z0-9]/.test(valor)) puntos += 1;
+        const niveles = [
+            { ancho: '0%', color: 'transparent', texto: 'Mínimo 6 caracteres. Se recomienda combinar letras, números y símbolos.' },
+            { ancho: '25%', color: '#c53030', texto: 'Contraseña débil.' },
+            { ancho: '45%', color: '#c05621', texto: 'Contraseña básica; agrega variedad.' },
+            { ancho: '65%', color: '#b7791f', texto: 'Contraseña aceptable.' },
+            { ancho: '82%', color: '#2f855a', texto: 'Contraseña fuerte.' },
+            { ancho: '100%', color: '#276749', texto: 'Contraseña muy fuerte.' }
+        ];
+        const nivel = niveles[Math.min(puntos, niveles.length - 1)];
+        barra.style.width = nivel.ancho;
+        barra.style.background = nivel.color;
+        ayuda.textContent = nivel.texto;
+    }
 
-    /* ═══════════════════════════════════════════════════════════════
-       EVENT LISTENERS
-    ═══════════════════════════════════════════════════════════════ */
-    // Enter en el Tutor
-    document.getElementById('dInputConsulta').addEventListener('keypress', e => {
-        if (e.key === 'Enter') preguntarTutor();
+    /* ─── EVENT LISTENERS ─── */
+    document.getElementById('dNuevoNombre')?.addEventListener('input', function() {
+        this.value = this.value.replace(/[^a-zA-Z0-9_]/g, '');
     });
-    // Enter en Lupa Legal
-    document.getElementById('dKeywordLupa').addEventListener('keypress', e => {
-        if (e.key === 'Enter') buscarFragmento();
+    document.getElementById('dInputConsulta').addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            preguntarTutor();
+        }
     });
-    // Botón Enviar del Tutor
+    document.getElementById('dKeywordLupa').addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            buscarFragmento();
+        }
+    });
+    document.getElementById('dArchivoTutor')?.addEventListener('change', actualizarContextoTutor);
+    document.getElementById('dBuscarDocumento')?.addEventListener('input', filtrarDocumentosRepositorio);
+    document.getElementById('dNuevoPass')?.addEventListener('input', e => actualizarFortalezaPassword(e.target.value));
+
+    const uploadZone = document.getElementById('dUploadZone');
+    const uploadInput = document.getElementById('dInputFile');
+    uploadZone?.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            uploadInput?.click();
+        }
+    });
+    ['dragenter', 'dragover'].forEach(nombreEvento => {
+        uploadZone?.addEventListener(nombreEvento, e => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+    });
+    ['dragleave', 'drop'].forEach(nombreEvento => {
+        uploadZone?.addEventListener(nombreEvento, e => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+        });
+    });
+    uploadZone?.addEventListener('drop', e => {
+        const archivo = e.dataTransfer?.files?.[0];
+        if (!archivo) return;
+        if (!archivo.name.toLocaleLowerCase('es').endsWith('.pdf')) {
+            mostrarFeedbackFuente('❌ Selecciona un archivo con formato PDF.', 'error');
+            return;
+        }
+        const transferencia = new DataTransfer();
+        transferencia.items.add(archivo);
+        uploadInput.files = transferencia.files;
+        actualizarNombreArchivo(uploadInput);
+    });
+    document.getElementById('dBuscarFicha')?.addEventListener('input', e => {
+        clearTimeout(glossarySearchTimer);
+        glossarySearchTimer = setTimeout(() => cargarFichasGuardadas(e.target.value), 250);
+    });
+    document.getElementById('dBtnLimpiarBusquedaFicha')?.addEventListener('click', () => {
+        const buscador = document.getElementById('dBuscarFicha');
+        buscador.value = '';
+        cargarFichasGuardadas('');
+        buscador.focus();
+    });
+    document.getElementById('dBtnLimpiarTutor')?.addEventListener('click', limpiarTutor);
     document.getElementById('dBtnEnviar').addEventListener('click', preguntarTutor);
-    // Botón Buscar de Lupa
     document.getElementById('dBtnAnalizar').addEventListener('click', buscarFragmento);
-    // Botón Registrar usuario admin
+    document.getElementById('dBtnLimpiarLupa')?.addEventListener('click', () => {
+        document.getElementById('dKeywordLupa').value = '';
+        document.getElementById('dArchivoLupa').value = '';
+        document.getElementById('dResultadoLupa').innerHTML = LUPA_EMPTY_HTML;
+        document.getElementById('dKeywordLupa').focus();
+    });
     document.getElementById('dBtnRegistrar').addEventListener('click', crearUsuarioAdmin);
 
-    // Accesibilidad: activar tabs con Enter / Espacio
     document.querySelectorAll('.nav-tab-item[tabindex]').forEach(tab => {
         tab.addEventListener('keydown', e => {
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tab.click(); }
         });
     });
 
-    /* ─── Inicio: verificar autenticación al cargar ─── */
+    document.addEventListener('keydown', e => {
+        if (e.key !== 'Escape') return;
+        if (document.getElementById('lexiaModalAlerta').style.display === 'flex') cerrarAlertaCustom();
+        else if (document.getElementById('lexiaModalConfirmacion').style.display === 'flex') cerrarConfirmacionCustom(false);
+        else if (document.getElementById('lexiaModalSetupMFA').style.display === 'flex') cerrarModalSetupMFA();
+    });
+
     document.addEventListener('DOMContentLoaded', verificarAuth);
 </script>
 

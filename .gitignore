@@ -19,5 +19,9 @@ __pycache__/
 
 # Bases de datos SQLite y datos de usuarios
 data/
+legacy/
+output/
+respaldos_ux/
+tmp/
 *.db
 *.sqlite
